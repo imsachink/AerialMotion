@@ -1,18 +1,18 @@
 import SwiftUI
+import AppKit
 
-// MARK: - Root menu bar content
+// MARK: - Main MenuBar popover view
+// Liquid glass design, fully responsive, zero-margin layout.
 
-/// The panel that appears when user clicks the menu bar icon.
-/// Width: 380px. Shows DropZone + wallpaper grid.
 struct MenuBarView: View {
 
-    @EnvironmentObject var store: WallpaperStore
+    @EnvironmentObject private var store: WallpaperStore
+    @StateObject private var updateChecker = UpdateChecker.shared
+    @State private var isTargeted = false
     @State private var showSettings = false
-    @State private var isTargeted   = false  // drag-over state for entire panel
 
     var body: some View {
         ZStack {
-            // Background — glass effect matching system appearance
             VisualEffectBackground()
                 .ignoresSafeArea()
 
@@ -40,6 +40,18 @@ struct MenuBarView: View {
             SettingsView()
                 .environmentObject(store)
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenSettingsRequested"))) { _ in
+            showSettings = true
+        }
+        // Hidden keyboard shortcut for Cmd+Q
+        .background(
+            Button("") {
+                NSApplication.shared.terminate(nil)
+            }
+            .keyboardShortcut("q", modifiers: .command)
+            .opacity(0)
+            .frame(width: 0, height: 0)
+        )
         // Error toast
         .overlay(alignment: .bottom) {
             if let err = store.errorMessage {
@@ -70,7 +82,6 @@ struct MenuBarView: View {
                 .font(.system(size: 14, weight: .semibold))
             Spacer()
 
-
             Button {
                 showSettings = true
             } label: {
@@ -84,12 +95,12 @@ struct MenuBarView: View {
             Button {
                 NSApplication.shared.terminate(nil)
             } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 13))
+                Image(systemName: "power")
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
-            .help("Quit AerialMotion")
+            .help("Quit AerialMotion (⌘Q)")
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
@@ -178,7 +189,28 @@ struct MenuBarView: View {
     // MARK: - Footer
 
     private var footer: some View {
-        HStack {
+        HStack(spacing: 12) {
+            // Check for updates
+            Button {
+                Task { await updateChecker.checkForUpdates(userInitiated: true) }
+            } label: {
+                HStack(spacing: 4) {
+                    if updateChecker.isChecking {
+                        ProgressView().controlSize(.mini)
+                    } else if updateChecker.updateAvailable {
+                        Image(systemName: "arrow.down.circle.fill")
+                            .foregroundStyle(.green)
+                    } else {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                    Text(updateChecker.updateAvailable ? "Update Available!" : "Check Updates")
+                        .font(.system(size: 11))
+                }
+                .foregroundStyle(updateChecker.updateAvailable ? .green : .secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Check GitHub for new AerialMotion updates")
+
             if !store.items.isEmpty {
                 Button {
                     store.restore()
@@ -193,9 +225,23 @@ struct MenuBarView: View {
 
             Spacer()
 
-            Text("\(store.items.count) wallpaper\(store.items.count == 1 ? "" : "s")")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
+            // Quit AerialMotion
+            Button {
+                NSApplication.shared.terminate(nil)
+            } label: {
+                HStack(spacing: 3) {
+                    Text("Quit")
+                        .font(.system(size: 11, weight: .medium))
+                    Text("⌘Q")
+                        .font(.system(size: 9))
+                        .padding(.horizontal, 3)
+                        .padding(.vertical, 1)
+                        .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 3))
+                }
+                .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Quit AerialMotion completely (⌘Q)")
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 8)

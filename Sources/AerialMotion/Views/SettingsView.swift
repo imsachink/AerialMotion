@@ -1,214 +1,256 @@
 import SwiftUI
+import AppKit
 
-// MARK: - Settings panel
+// MARK: - Settings view
+// Liquid glass design, System Settings style layout.
 
 struct SettingsView: View {
 
-    @EnvironmentObject var store: WallpaperStore
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var store: WallpaperStore
+    @StateObject private var updateChecker = UpdateChecker.shared
 
-    @AppStorage("thumbnailAt")   private var thumbnailAt:   Int    = 1
-    @AppStorage("stripAudio")    private var stripAudio:    Bool   = true
-    @AppStorage("launchAtLogin") private var launchAtLogin: Bool   = false
-    @AppStorage("menuBarMonochrome") private var menuBarMonochrome: Bool = false
+    @AppStorage("thumbnailAt")       private var thumbnailAt: Int = 1
+    @AppStorage("stripAudio")         private var stripAudio: Bool = true
+    @AppStorage("launchAtLogin")      private var launchAtLogin: Bool = false
+    @AppStorage("menuBarMonochrome")  private var menuBarMonochrome: Bool = false
 
     private var ffmpegInstalled: Bool { VideoProcessor.ffmpegPath() != nil }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Title bar
-            HStack {
-                Text("Settings")
-                    .font(.headline)
-                Spacer()
-                Button { dismiss() } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.secondary)
+        ZStack {
+            VisualEffectBackground()
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Title bar
+                HStack {
+                    Text("Settings")
+                        .font(.headline)
+                    Spacer()
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
-            }
-            .padding()
+                .padding()
 
-            Divider()
+                Divider()
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
 
-                    // ── App Header / About ─────────────────────────────────
-                    HStack(spacing: 14) {
-                        if let logo = AppLogo.image {
-                            Image(nsImage: logo)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 48, height: 48)
-                                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
-                                .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
-                        }
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("AerialMotion")
-                                .font(.system(size: 15, weight: .bold))
-                            Text("Version 1.0.0 • Native Live Wallpapers")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text("Built for macOS 14+ Sonoma & Sequoia")
-                                .font(.caption2)
-                                .foregroundStyle(.tertiary)
-                        }
-                        Spacer()
-                    }
-                    .padding(.vertical, 4)
-
-                    Divider()
-
-                    // ── Engine status ──────────────────────────────────────
-                    section(title: "Conversion Engine") {
-                        VStack(spacing: 8) {
-                            HStack {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(.green)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Native Apple AVFoundation")
-                                        .font(.system(size: 12, weight: .medium))
-                                    Text("Built-in macOS hardware acceleration (Zero dependencies)")
+                        // ── Engine status ──────────────────────────────────
+                        section(title: "Engine Status") {
+                            VStack(spacing: 6) {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(.green)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Apple Silicon Hardware Acceleration")
+                                            .font(.system(size: 12, weight: .medium))
+                                        Text("VideoToolbox 10-bit HEVC encoder active")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Text("Active")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(.green)
                                 }
-                                Spacer()
-                                Text("Active")
-                                    .font(.caption2)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.green.opacity(0.15), in: Capsule())
-                                    .foregroundStyle(.green)
-                            }
 
-                            HStack {
-                                Image(systemName: ffmpegInstalled ? "bolt.fill" : "bolt.slash")
-                                    .foregroundStyle(ffmpegInstalled ? .blue : .secondary)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(ffmpegInstalled ? "ffmpeg accelerator active" : "ffmpeg (Optional)")
-                                        .font(.system(size: 12, weight: .medium))
-                                    Text(ffmpegInstalled ? "Fast stream-copy enabled" : "Optional fallback for esoteric codecs")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                HStack {
+                                    Image(systemName: ffmpegInstalled ? "bolt.fill" : "bolt.slash")
+                                        .foregroundStyle(ffmpegInstalled ? .blue : .secondary)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(ffmpegInstalled ? "ffmpeg accelerator active" : "ffmpeg (Optional)")
+                                            .font(.system(size: 12, weight: .medium))
+                                        Text(ffmpegInstalled ? "Fast stream-copy enabled" : "Optional fallback for esoteric codecs")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
                                 }
-                                Spacer()
                             }
+                            .padding(10)
+                            .background(
+                                Color.secondary.opacity(0.06),
+                                in: RoundedRectangle(cornerRadius: 8)
+                            )
                         }
-                        .padding(10)
-                        .background(
-                            Color.secondary.opacity(0.06),
-                            in: RoundedRectangle(cornerRadius: 8)
-                        )
-                    }
 
-                    // ── Video options ──────────────────────────────────────
-                    section(title: "Video") {
-                        VStack(spacing: 10) {
-                            row(label: "Thumbnail at", description: "Second of video used for preview image") {
-                                HStack(spacing: 6) {
-                                    Stepper("", value: $thumbnailAt, in: 0...30)
+                        // ── Video options ──────────────────────────────────
+                        section(title: "Video") {
+                            VStack(spacing: 10) {
+                                row(label: "Thumbnail at", description: "Second of video used for preview image") {
+                                    HStack(spacing: 6) {
+                                        Stepper("", value: $thumbnailAt, in: 0...30)
+                                            .labelsHidden()
+                                        Text("\(thumbnailAt)s")
+                                            .font(.system(size: 12, design: .monospaced))
+                                            .frame(width: 28)
+                                    }
+                                }
+
+                                Divider()
+
+                                row(label: "Strip audio", description: "Remove audio track from wallpaper video") {
+                                    Toggle("", isOn: $stripAudio)
                                         .labelsHidden()
-                                    Text("\(thumbnailAt)s")
-                                        .font(.system(size: 12, design: .monospaced))
-                                        .frame(width: 28)
+                                        .toggleStyle(.switch)
                                 }
                             }
+                        }
 
-                            Divider()
+                        // ── App & Appearance ───────────────────────────────
+                        section(title: "App & Appearance") {
+                            row(label: "Launch at login", description: "Start AerialMotion automatically when you log in") {
+                                Toggle("", isOn: $launchAtLogin)
+                                    .labelsHidden()
+                                    .toggleStyle(.switch)
+                                    .onChange(of: launchAtLogin) { _, enabled in
+                                        setLaunchAtLogin(enabled)
+                                    }
+                            }
 
-                            row(label: "Strip audio", description: "Remove audio track from wallpaper video") {
-                                Toggle("", isOn: $stripAudio)
+                            row(label: "Monochrome Menu Bar Icon", description: "Use outline symbol instead of full-color app logo") {
+                                Toggle("", isOn: $menuBarMonochrome)
                                     .labelsHidden()
                                     .toggleStyle(.switch)
                             }
                         }
-                    }
 
-                    // ── App ────────────────────────────────────────────────
-                    section(title: "App & Appearance") {
-                        row(label: "Launch at login", description: "Start AerialMotion automatically when you log in") {
-                            Toggle("", isOn: $launchAtLogin)
-                                .labelsHidden()
-                                .toggleStyle(.switch)
-                                .onChange(of: launchAtLogin) { _, enabled in
-                                    setLaunchAtLogin(enabled)
+                        // ── Updates ────────────────────────────────────────
+                        section(title: "Software Updates") {
+                            VStack(spacing: 8) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("AerialMotion v\(updateChecker.currentVersion)")
+                                            .font(.system(size: 12, weight: .medium))
+                                        if let msg = updateChecker.statusMessage {
+                                            Text(msg)
+                                                .font(.caption)
+                                                .foregroundStyle(updateChecker.updateAvailable ? .green : .secondary)
+                                        } else {
+                                            Text("Check GitHub for the latest release")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+                                    Spacer()
+
+                                    Button {
+                                        Task { await updateChecker.checkForUpdates(userInitiated: true) }
+                                    } label: {
+                                        if updateChecker.isChecking {
+                                            ProgressView().controlSize(.small)
+                                        } else {
+                                            Text(updateChecker.updateAvailable ? "Download" : "Check Now")
+                                                .font(.caption)
+                                        }
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .tint(updateChecker.updateAvailable ? .green : .accentColor)
                                 }
-                        }
-
-                        row(label: "Monochrome Menu Bar Icon", description: "Use outline symbol instead of full-color app logo") {
-                            Toggle("", isOn: $menuBarMonochrome)
-                                .labelsHidden()
-                                .toggleStyle(.switch)
-                        }
-                    }
-
-                    // ── Library ────────────────────────────────────────────
-                    section(title: "Library") {
-                        HStack(spacing: 8) {
-                            Button("Open Library Folder") {
-                                NSWorkspace.shared.open(libDir)
                             }
-                            .buttonStyle(.bordered)
-                            .font(.caption)
-
-                            Button("Restore Apple Originals") {
-                                store.restore()
-                                dismiss()
-                            }
-                            .buttonStyle(.bordered)
-                            .font(.caption)
-                            .foregroundStyle(.red)
+                            .padding(10)
+                            .background(
+                                Color.secondary.opacity(0.06),
+                                in: RoundedRectangle(cornerRadius: 8)
+                            )
                         }
-                    }
 
-                    // ── About & Support ────────────────────────────────────
-                    section(title: "About & Support") {
-                        VStack(spacing: 8) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("AerialMotion v1.0.0")
-                                        .font(.system(size: 12, weight: .semibold))
-                                    Text("Native live video wallpapers for macOS")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                                Spacer()
-                                Button("GitHub") {
-                                    NSWorkspace.shared.open(
-                                        URL(string: "https://github.com/imsachink/AerialMotion")!)
+                        // ── Library ────────────────────────────────────────
+                        section(title: "Library") {
+                            HStack(spacing: 8) {
+                                Button("Open Library Folder") {
+                                    NSWorkspace.shared.open(libDir)
                                 }
                                 .buttonStyle(.bordered)
                                 .font(.caption)
-                            }
 
-                            Divider()
-
-                            HStack {
-                                Text("Enjoying AerialMotion?")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Spacer()
-                                Button("Buy Me a Coffee ☕") {
-                                    NSWorkspace.shared.open(
-                                        URL(string: "https://buymeacoffee.com/sachinkaundal")!)
+                                Button("Restore Apple Originals") {
+                                    store.restore()
+                                    dismiss()
                                 }
-                                .buttonStyle(.borderedProminent)
-                                .tint(Color.orange)
+                                .buttonStyle(.bordered)
                                 .font(.caption)
+                                .foregroundStyle(.red)
                             }
                         }
-                        .padding(10)
-                        .background(
-                            Color.secondary.opacity(0.06),
-                            in: RoundedRectangle(cornerRadius: 8)
-                        )
+
+                        // ── About & Support ────────────────────────────────
+                        section(title: "About & Support") {
+                            VStack(spacing: 8) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("AerialMotion")
+                                            .font(.system(size: 12, weight: .semibold))
+                                        Text("Created by Sachin Kaundal • MIT License")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Button("GitHub") {
+                                        NSWorkspace.shared.open(
+                                            URL(string: "https://github.com/imsachink/AerialMotion")!)
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .font(.caption)
+                                }
+
+                                Divider()
+
+                                HStack {
+                                    Text("Enjoying AerialMotion?")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                    Button("Buy Me a Coffee ☕") {
+                                        NSWorkspace.shared.open(
+                                            URL(string: "https://buymeacoffee.com/sachinkaundal")!)
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .tint(Color.orange)
+                                    .font(.caption)
+                                }
+                            }
+                            .padding(10)
+                            .background(
+                                Color.secondary.opacity(0.06),
+                                in: RoundedRectangle(cornerRadius: 8)
+                            )
+                        }
+
+                        // ── Danger Zone / Quit ─────────────────────────────
+                        section(title: "Application Control") {
+                            Button {
+                                NSApplication.shared.terminate(nil)
+                            } label: {
+                                HStack {
+                                    Image(systemName: "power")
+                                    Text("Quit AerialMotion")
+                                    Spacer()
+                                    Text("⌘Q")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.red)
+                                .frame(maxWidth: .infinity)
+                                .padding(8)
+                                .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
+                    .padding()
                 }
-                .padding()
             }
         }
-        .frame(width: 380, height: 480)
+        .frame(width: 380, height: 520)
     }
 
     // MARK: - Helpers
@@ -243,8 +285,6 @@ struct SettingsView: View {
     }
 
     private func setLaunchAtLogin(_ enabled: Bool) {
-        // Use SMAppService on macOS 13+
-        // For simplicity, open Login Items System Settings
         if enabled {
             NSWorkspace.shared.open(
                 URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension")!)
