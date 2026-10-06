@@ -46,6 +46,20 @@ enum IndexManager {
                     }
                 }
             }
+            if dict["Desktop"] != nil || dict["Idle"] != nil {
+                let now = Date()
+                if var desktop = dict["Desktop"] as? [String: Any] {
+                    desktop["LastSet"] = now
+                    desktop["LastUse"] = now
+                    dict["Desktop"] = desktop
+                }
+                if var idle = dict["Idle"] as? [String: Any] {
+                    idle["LastSet"] = now
+                    idle["LastUse"] = now
+                    dict["Idle"] = idle
+                }
+            }
+
             for key in dict.keys {
                 walk(&dict[key]!, assetID: assetID, count: &count)
             }

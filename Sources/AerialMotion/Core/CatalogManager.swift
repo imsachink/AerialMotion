@@ -47,12 +47,14 @@ enum CatalogManager {
         let dst = item.catalogVideoURL
         if fm.fileExists(atPath: dst.path) { try? fm.removeItem(at: dst) }
         try fm.copyItem(at: item.libraryVideoURL, to: dst)
+        _ = await VideoProcessor.run("/usr/bin/xattr", "-cr", dst.path)
 
         // Copy thumbnail
         let dstThumb = item.catalogThumbURL
         if fm.fileExists(atPath: dstThumb.path) { try? fm.removeItem(at: dstThumb) }
         if fm.fileExists(atPath: item.libraryThumbURL.path) {
             try fm.copyItem(at: item.libraryThumbURL, to: dstThumb)
+            _ = await VideoProcessor.run("/usr/bin/xattr", "-cr", dstThumb.path)
         }
 
         // Mutate entries.json

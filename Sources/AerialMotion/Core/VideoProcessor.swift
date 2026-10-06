@@ -109,6 +109,21 @@ enum VideoProcessor {
         }
     }
 
+    private static func isSourceHEVC(source: URL) async -> Bool {
+        let asset = AVURLAsset(url: source)
+        guard let tracks = try? await asset.loadTracks(withMediaType: .video) else { return false }
+        for track in tracks {
+            guard let formatDescs = try? await track.load(.formatDescriptions) else { continue }
+            for desc in formatDescs {
+                let subType = CMFormatDescriptionGetMediaSubType(desc)
+                if subType == 0x68766331 || subType == 0x68657631 { // 'hvc1' or 'hev1'
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     // MARK: - Video conversion
     // Priority:
     // 1. ffmpeg stream-copy (if installed)
@@ -124,78 +139,93 @@ enum VideoProcessor {
         let tmpDest = dest.deletingPathExtension().appendingPathExtension("tmp.mov")
         defer { try? fm.removeItem(at: tmpDest) }
 
-        // Method 1: ffmpeg stream-copy if available
+        let alreadyHEVC = await isSourceHEVC(source: source)
+
+        // If source is already valid HEVC (hvc1), stream-copy directly
+        if alreadyHEVC {
+            if let ff = ffmpegPath() {
+                progress(0.3)
+                let r = await run(ff, "-y", "-loglevel", "error",
+                                  "-i", source.path,
+                                  "-c:v", "copy", "-an",
+                                  "-movflags", "+faststart",
+                                  tmpDest.path)
+                if r == 0,
+                   let attrs = try? fm.attributesOfItem(atPath: tmpDest.path),
+                   (attrs[.size] as? Int64 ?? 0) > 0 {
+                    try? fm.removeItem(at: dest)
+                    try fm.moveItem(at: tmpDest, to: dest)
+                    _ = await run("/usr/bin/xattr", "-cr", dest.path)
+                    progress(0.95)
+                    return
+                }
+            }
+
+            if fm.fileExists(atPath: "/usr/bin/avconvert") {
+                progress(0.5)
+                let r = await run("/usr/bin/avconvert",
+                                  "-s", source.path,
+                                  "-o", tmpDest.path,
+                                  "-p", "PresetPassthrough",
+                                  "--replace")
+                if r == 0 && fm.fileExists(atPath: tmpDest.path) {
+                    try? fm.removeItem(at: dest)
+                    try fm.moveItem(at: tmpDest, to: dest)
+                    _ = await run("/usr/bin/xattr", "-cr", dest.path)
+                    progress(0.95)
+                    return
+                }
+            }
+        }
+
+        // If not HEVC (e.g. H.264/AVC1 or other format), encode to HEVC hvc1 (required by macOS lock screen)
+        progress(0.3)
         if let ff = ffmpegPath() {
-            progress(0.3)
             let r = await run(ff, "-y", "-loglevel", "error",
                               "-i", source.path,
-                              "-c:v", "copy", "-an",
+                              "-c:v", "hevc_videotoolbox",
+                              "-tag:v", "hvc1",
+                              "-b:v", "18M",
+                              "-pix_fmt", "yuv420p",
                               "-movflags", "+faststart",
+                              "-an",
                               tmpDest.path)
             if r == 0,
                let attrs = try? fm.attributesOfItem(atPath: tmpDest.path),
                (attrs[.size] as? Int64 ?? 0) > 0 {
                 try? fm.removeItem(at: dest)
                 try fm.moveItem(at: tmpDest, to: dest)
+                _ = await run("/usr/bin/xattr", "-cr", dest.path)
                 progress(0.95)
                 return
             }
         }
 
-        // Method 2: Native AVAssetExportSession (no external tool needed)
-        progress(0.4)
+        // Fallback: Built-in macOS /usr/bin/avconvert HEVC
+        progress(0.5)
+        if fm.fileExists(atPath: "/usr/bin/avconvert") {
+            let r = await run("/usr/bin/avconvert",
+                              "-s", source.path,
+                              "-o", tmpDest.path,
+                              "-p", "PresetHEVCHighestQuality",
+                              "--replace")
+            if r == 0 && fm.fileExists(atPath: tmpDest.path) {
+                try? fm.removeItem(at: dest)
+                try fm.moveItem(at: tmpDest, to: dest)
+                _ = await run("/usr/bin/xattr", "-cr", dest.path)
+                progress(0.95)
+                return
+            }
+        }
+
+        // Fallback: Native AVAssetExportSession HEVC
+        progress(0.7)
         if await convertVideoAVFoundation(source: source, dest: tmpDest) {
             if let attrs = try? fm.attributesOfItem(atPath: tmpDest.path),
                (attrs[.size] as? Int64 ?? 0) > 0 {
                 try? fm.removeItem(at: dest)
                 try fm.moveItem(at: tmpDest, to: dest)
-                progress(0.95)
-                return
-            }
-        }
-
-        // Method 3: Built-in macOS /usr/bin/avconvert (comes pre-installed on macOS)
-        progress(0.6)
-        if fm.fileExists(atPath: "/usr/bin/avconvert") {
-            let r = await run("/usr/bin/avconvert",
-                              "-s", source.path,
-                              "-o", tmpDest.path,
-                              "-p", "PresetPassthrough",
-                              "--replace")
-            if r == 0 && fm.fileExists(atPath: tmpDest.path) {
-                try? fm.removeItem(at: dest)
-                try fm.moveItem(at: tmpDest, to: dest)
-                progress(0.95)
-                return
-            }
-
-            let r2 = await run("/usr/bin/avconvert",
-                               "-s", source.path,
-                               "-o", tmpDest.path,
-                               "-p", "PresetHEVCHighestQuality",
-                               "--replace")
-            if r2 == 0 && fm.fileExists(atPath: tmpDest.path) {
-                try? fm.removeItem(at: dest)
-                try fm.moveItem(at: tmpDest, to: dest)
-                progress(0.95)
-                return
-            }
-        }
-
-        // Method 4: ffmpeg hardware encode fallback
-        if let ff = ffmpegPath() {
-            progress(0.7)
-            let r = await run(ff, "-y", "-loglevel", "error",
-                              "-i", source.path,
-                              "-c:v", "hevc_videotoolbox",
-                              "-tag:v", "hvc1",
-                              "-q:v", "55",
-                              "-pix_fmt", "yuv420p",
-                              "-vf", "scale=trunc(iw/2)*2:trunc(ih/2)*2",
-                              "-movflags", "+faststart",
-                              "-an",
-                              dest.path)
-            if r == 0 && fm.fileExists(atPath: dest.path) {
+                _ = await run("/usr/bin/xattr", "-cr", dest.path)
                 progress(0.95)
                 return
             }
