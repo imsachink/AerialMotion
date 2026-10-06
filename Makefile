@@ -37,7 +37,7 @@ app: build
   <key>CFBundleExecutable</key><string>$(APP_NAME)</string>\n\
   <key>CFBundleIconFile</key><string>AppIcon</string>\n\
   <key>CFBundlePackageType</key><string>APPL</string>\n\
-  <key>CFBundleShortVersionString</key><string>1.1.0</string>\n\
+  <key>CFBundleShortVersionString</key><string>1.1.1</string>\n\
   <key>CFBundleVersion</key><string>1</string>\n\
   <key>LSMinimumSystemVersion</key><string>15.0</string>\n\
   <key>LSUIElement</key><true/>\n\

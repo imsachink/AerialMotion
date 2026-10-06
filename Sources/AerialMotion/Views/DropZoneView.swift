@@ -1,14 +1,15 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import AppKit
 
 // MARK: - Drop zone for adding new videos
+// Full-area clickable button + drag-and-drop target.
 
 struct DropZoneView: View {
 
     @EnvironmentObject var store: WallpaperStore
     @State private var isTargeted = false
 
-    // Any item currently being processed?
     private var isProcessing: Bool { !store.processingStatus.isEmpty }
 
     var body: some View {
@@ -25,42 +26,46 @@ struct DropZoneView: View {
     // MARK: - Drop target (idle)
 
     private var dropTarget: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(
-                    isTargeted
-                        ? Color.accentColor
-                        : Color.secondary.opacity(0.3),
-                    style: StrokeStyle(lineWidth: 1.5, dash: [6, 4])
-                )
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(isTargeted
-                              ? Color.accentColor.opacity(0.08)
-                              : Color.clear)
-                )
+        Button {
+            openFilePicker()
+        } label: {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .strokeBorder(
+                        isTargeted ? Color.accentColor : Color.secondary.opacity(0.3),
+                        style: StrokeStyle(lineWidth: 1.5, dash: [6, 4])
+                    )
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(isTargeted ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.04))
+                    )
 
-            HStack(spacing: 10) {
-                Image(systemName: "arrow.down.circle.dotted")
-                    .font(.system(size: 20))
-                    .foregroundStyle(isTargeted ? Color.accentColor : .secondary)
-                    .symbolEffect(.bounce, value: isTargeted)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Drop video here")
-                        .font(.system(size: 12, weight: .medium))
-                    Text("or")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                    Button("Browse files…") { openFilePicker() }
-                        .buttonStyle(.plain)
-                        .font(.caption)
+                HStack(spacing: 12) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 22))
                         .foregroundStyle(Color.accentColor)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Add Video Wallpaper")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.primary)
+                        Text("Click to choose file, or drag video here")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "folder")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
                 }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
             }
-            .padding(.vertical, 14)
         }
-        .frame(height: 64)
+        .buttonStyle(.plain)
+        .frame(height: 56)
         .onDrop(of: [UTType.fileURL], isTargeted: $isTargeted) { providers in
             handleDrop(providers)
         }
@@ -99,10 +104,13 @@ struct DropZoneView: View {
 
     private func openFilePicker() {
         let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.movie, .mpeg4Movie]
+        panel.allowedContentTypes = [.movie, .mpeg4Movie, .quickTimeMovie]
         panel.allowsMultipleSelection = false
-        panel.message = "Select a video to use as wallpaper"
-        panel.prompt  = "Use as Wallpaper"
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.message = "Select an MP4 or MOV video for your wallpaper"
+        panel.prompt = "Choose Video"
+
         if panel.runModal() == .OK, let url = panel.url {
             store.add(url: url)
         }

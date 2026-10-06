@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import UniformTypeIdentifiers
 
 // MARK: - App entry point
 
@@ -134,10 +135,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
+        let addVideoItem = NSMenuItem(title: "Add Video Wallpaper…", action: #selector(addVideoAction), keyEquivalent: "n")
+        addVideoItem.target = self
+        menu.addItem(addVideoItem)
+
         let desktopMotionItem = NSMenuItem(title: "Continuous Desktop Motion", action: #selector(toggleDesktopMotionAction), keyEquivalent: "d")
         desktopMotionItem.target = self
         desktopMotionItem.state = LiveDesktopManager.shared.isEnabled ? .on : .off
         menu.addItem(desktopMotionItem)
+
+        menu.addItem(NSMenuItem.separator())
 
         let updateItem = NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdatesAction), keyEquivalent: "u")
         updateItem.target = self
@@ -168,6 +175,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(quitItem)
 
         menu.popUp(positioning: nil, at: location, in: nil)
+    }
+
+    @objc private func addVideoAction() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.movie, .mpeg4Movie, .quickTimeMovie]
+        panel.allowsMultipleSelection = false
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.message = "Select an MP4 or MOV video for your wallpaper"
+        panel.prompt = "Choose Video"
+
+        if panel.runModal() == .OK, let url = panel.url {
+            Task { @MainActor in
+                WallpaperStore.shared.add(url: url)
+            }
+        }
     }
 
     @objc private func toggleDesktopMotionAction() {

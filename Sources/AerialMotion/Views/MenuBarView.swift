@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 // MARK: - Main MenuBar popover view
-// Liquid glass design, fully responsive, zero-margin layout.
+// Liquid glass design, responsive layout, clear library visibility.
 
 struct MenuBarView: View {
 
@@ -31,8 +31,7 @@ struct MenuBarView: View {
                 footer
             }
         }
-        .frame(width: 380)
-        .frame(minHeight: 180, maxHeight: 540)
+        .frame(width: 380, height: 490)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         // Whole-panel drop target
         .onDrop(of: [.fileURL], isTargeted: $isTargeted) { providers in
@@ -79,6 +78,17 @@ struct MenuBarView: View {
             Text("AerialMotion")
                 .font(.system(size: 14, weight: .semibold))
             Spacer()
+
+            // Quick add button
+            Button {
+                openFilePicker()
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Add Video Wallpaper (⌘O)")
 
             Button {
                 showSettings = true
@@ -133,23 +143,35 @@ struct MenuBarView: View {
     private var desktopMotionCard: some View {
         HStack(spacing: 10) {
             Image(systemName: liveDesktop.isPlaying ? "display" : "display.slash")
-                .font(.system(size: 15))
+                .font(.system(size: 16))
                 .foregroundStyle(liveDesktop.isPlaying ? .green : .secondary)
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
                     Text("Desktop Live Motion")
                         .font(.system(size: 12, weight: .medium))
-                    if liveDesktop.isEnabled && liveDesktop.pauseOnBattery {
-                        Image(systemName: "battery.100.bolt")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.green)
-                            .help("Battery saver active (pauses on battery)")
+                    if liveDesktop.isEnabled {
+                        Circle()
+                            .fill(liveDesktop.isPlaying ? Color.green : Color.orange)
+                            .frame(width: 6, height: 6)
                     }
                 }
-                Text(liveDesktop.statusDescription)
-                    .font(.system(size: 10))
-                    .foregroundStyle(liveDesktop.pauseReason != nil ? .orange : .secondary)
+
+                HStack(spacing: 6) {
+                    Text(liveDesktop.statusDescription)
+                        .font(.system(size: 10))
+                        .foregroundStyle(liveDesktop.pauseReason != nil ? .orange : .secondary)
+
+                    if liveDesktop.pauseReason == "Paused: Battery Saver" {
+                        Button("Play on Battery") {
+                            liveDesktop.pauseOnBattery = false
+                        }
+                        .font(.system(size: 9, weight: .medium))
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.mini)
+                        .tint(Color.blue)
+                    }
+                }
             }
 
             Spacer()
@@ -170,7 +192,7 @@ struct MenuBarView: View {
     // MARK: - Scrollable content
 
     private var scrollContent: some View {
-        ScrollView(.vertical, showsIndicators: false) {
+        ScrollView(.vertical, showsIndicators: true) {
             VStack(spacing: 12) {
                 if !CatalogManager.isSystemReady {
                     setupCard
@@ -194,7 +216,7 @@ struct MenuBarView: View {
                         .padding(.horizontal, 12)
                 }
             }
-            .padding(.bottom, 10)
+            .padding(.bottom, 12)
         }
     }
 
@@ -242,7 +264,7 @@ struct MenuBarView: View {
             Image(systemName: "play.rectangle.on.rectangle")
                 .font(.system(size: 28))
                 .foregroundStyle(.tertiary)
-            Text("Drop a video to get started")
+            Text("No wallpapers added yet")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
         }
@@ -315,7 +337,21 @@ struct MenuBarView: View {
         .padding(.vertical, 8)
     }
 
-    // MARK: - Drop handler
+    // MARK: - Drop & File Picker
+
+    private func openFilePicker() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.movie, .mpeg4Movie, .quickTimeMovie]
+        panel.allowsMultipleSelection = false
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.message = "Select an MP4 or MOV video for your wallpaper"
+        panel.prompt = "Choose Video"
+
+        if panel.runModal() == .OK, let url = panel.url {
+            store.add(url: url)
+        }
+    }
 
     private func handleDrop(_ providers: [NSItemProvider]) -> Bool {
         var handled = false

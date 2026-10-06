@@ -5,32 +5,34 @@ import IOKit.ps
 import Combine
 
 // MARK: - Desktop Player Layer View
-// Backed directly by AVPlayerLayer for zero-copy hardware GPU rendering.
+// Backed directly by AVPlayerLayer with automatic layout bounds tracking.
 
 final class DesktopPlayerView: NSView {
-    override func makeBackingLayer() -> CALayer {
-        let layer = AVPlayerLayer()
-        layer.videoGravity = .resizeAspectFill
-        return layer
-    }
-
-    var playerLayer: AVPlayerLayer {
-        layer as! AVPlayerLayer
-    }
+    let playerLayer = AVPlayerLayer()
 
     init() {
         super.init(frame: .zero)
         wantsLayer = true
+        playerLayer.videoGravity = .resizeAspectFill
+        layer?.addSublayer(playerLayer)
         autoresizingMask = [.width, .height]
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    override func layout() {
+        super.layout()
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        playerLayer.frame = bounds
+        CATransaction.commit()
+    }
 }
 
 // MARK: - Desktop Window
-// Sits directly above desktop wallpaper but underneath Finder desktop icons.
+// Sits directly between Dock wallpaper backdrop (-2147483622) and Finder icons (-2147483603).
 
 final class DesktopWindow: NSWindow {
     override var canBecomeKey: Bool { false }
@@ -51,8 +53,8 @@ final class DesktopWindow: NSWindow {
             backing: .buffered,
             defer: false
         )
-        // Positioned between Apple static wallpaper (-2147483623) and Finder icons (-2147483603)
-        self.level = NSWindow.Level(Int(CGWindowLevelForKey(.desktopWindow)) + 1)
+        // Positioned between Dock wallpaper (-2147483622) and Finder desktop icons (-2147483603)
+        self.level = NSWindow.Level(Int(CGWindowLevelForKey(.desktopIconWindow)) - 1)
         self.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
         self.ignoresMouseEvents = true
         self.isOpaque = true
@@ -133,7 +135,8 @@ final class LiveDesktopManager: ObservableObject {
 
     private init() {
         let savedEnabled = UserDefaults.standard.object(forKey: "liveDesktopEnabled") as? Bool ?? true
-        let savedBattery = UserDefaults.standard.object(forKey: "pauseOnBattery") as? Bool ?? true
+        // Default to false so user gets motion right away out of the box, with option to save battery!
+        let savedBattery = UserDefaults.standard.object(forKey: "pauseOnBattery") as? Bool ?? false
         let savedLPM = UserDefaults.standard.object(forKey: "pauseInLowPowerMode") as? Bool ?? true
         let savedOccluded = UserDefaults.standard.object(forKey: "pauseWhenOccluded") as? Bool ?? true
 
@@ -253,7 +256,7 @@ final class LiveDesktopManager: ObservableObject {
             if let player = queuePlayer {
                 win.playerView?.playerLayer.player = player
             }
-            win.orderBack(nil)
+            win.orderFrontRegardless()
             desktopWindows.append(win)
 
             NotificationCenter.default.addObserver(
@@ -320,6 +323,7 @@ final class LiveDesktopManager: ObservableObject {
         } else {
             for win in desktopWindows {
                 win.playerView?.playerLayer.player = player
+                win.orderFrontRegardless()
             }
         }
 
@@ -383,7 +387,7 @@ final class LiveDesktopManager: ObservableObject {
             return
         }
 
-        // Priority 3: Battery Saver (Wallspace rule)
+        // Priority 3: Battery Saver (Wallspace rule - optional)
         if pauseOnBattery && isRunningOnBattery() {
             player.pause()
             isPlaying = false
