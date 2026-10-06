@@ -23,6 +23,12 @@
   <img src="assets/hero_banner.jpg" width="100%" alt="AerialMotion Hero Banner" style="border-radius: 12px;" />
 </p>
 
+<p align="center">
+  <img src="assets/demo.gif" width="100%" alt="AerialMotion Live Wallpaper Demo" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35);" />
+  <br />
+  <sub>🌧️ <em>Tranquil, cinematic live wallpaper motion on macOS • <a href="assets/demo.mp4">Download 1080p Video (demo.mp4)</a></em></sub>
+</p>
+
 ---
 
 ## 💡 Why AerialMotion?
@@ -53,7 +59,7 @@ Instead of running a background player, it integrates your video directly into m
 
 ## ✨ Features
 
-- **Drag & Drop Simplicity**: Drop any `.mp4` or `.mov` file onto the menu bar window to apply.
+- **1-Click Picker & Drag-and-Drop**: Click the drop zone to open the native macOS file picker (`⌘N`) or simply drag and drop any `.mp4`, `.mov`, or `.m4v` video.
 - **Lock Screen & Desktop Sync**: Both display the exact same video asset, synchronized seamlessly.
 - **Continuous Desktop Live Motion**: Optional continuous live video playback on your Home Screen / Desktop.
 - **Ultra-Low Battery Saver (Wallspace-Style)**:
@@ -68,6 +74,19 @@ Instead of running a background player, it integrates your video directly into m
 - **Safe State Rollback**: Restore Apple default wallpapers at any time with one click.
 
 ---
+
+## 📋 Release Notes & Changelog
+
+AerialMotion follows [Semantic Versioning](https://semver.org/). See the complete [CHANGELOG.md](CHANGELOG.md) for full version history.
+
+| Version | Highlights | Status |
+| :---: | :--- | :---: |
+| **v1.1.1** | **1-Click Native File Picker** (`⌘N` or click anywhere on drop zone), proper Dock/Finder window layer ordering (`-2147483604`), and instant popover sizing. | **Latest Release** |
+| **v1.1.0** | **Continuous Desktop Live Motion** (`AVPlayerLayer`), Wallspace-style multi-tier **Battery Saver** (Pause on Battery, Low Power Mode, Window Occlusion Sensing), and direct **In-App Auto-Updater**. | Stable |
+| **v1.0.1** | Dual-layer hierarchical HEVC remuxing (`temporal_id=0/1`), Mission Control multi-space fix, and status bar context menu. | Archived |
+| **v1.0.0** | Initial public launch: native macOS Sonoma/Sequoia lock screen and desktop video injection. | Archived |
+
+
 
 ## 📋 Requirements
 
@@ -105,7 +124,7 @@ Instead of running a background player, it integrates your video directly into m
 ## 🚀 How to Use
 
 1. Click the **AerialMotion** icon in your top menu bar.
-2. **Drag and drop** any `.mp4` or `.mov` video file onto the drop zone.
+2. **Click the drop zone** (or press `⌘N`) to pick a video file, or **drag and drop** any `.mp4` or `.mov` file directly onto the card.
 3. Your video becomes your active desktop and lock screen wallpaper instantly!
 4. Press `⌃ + ⌘ + Q` (Lock Screen) to enjoy seamless lock-screen playback.
 
