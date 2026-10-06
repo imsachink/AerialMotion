@@ -15,6 +15,7 @@ public enum AppLogo {
         // Try relative development paths
         let fallbackPaths = [
             "Resources/AppIcon.png",
+            "assets/icon.png",
             "assets/icon.jpg"
         ]
         for path in fallbackPaths {

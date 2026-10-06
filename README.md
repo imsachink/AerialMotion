@@ -68,7 +68,7 @@ Instead of running a background player, it integrates your video directly into m
 1. Download **[AerialMotion.dmg](https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg)** (Direct Download) or view [All Releases](https://github.com/imsachink/AerialMotion/releases).
 2. Double-click the `.dmg` — a custom installer window will appear:
    <p align="center">
-     <img src="Resources/installer_background.png" width="80%" style="border-radius: 10px; margin: 12px 0;" alt="AerialMotion Installer" />
+     <img src="assets/installer_preview.png" width="80%" style="border-radius: 10px; margin: 12px 0;" alt="AerialMotion Installer" />
    </p>
 3. Simply drag **AerialMotion** into the **Applications** shortcut.
 4. Open **AerialMotion** from Launchpad or Spotlight. It sits quietly in your top menu bar.
