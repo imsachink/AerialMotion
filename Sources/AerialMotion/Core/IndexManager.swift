@@ -5,20 +5,54 @@ import Foundation
 
 enum IndexManager {
 
-    /// Walk the plist tree and update every aerial Configuration's assetID.
-    /// Writes atomically. Caller is responsible for killing WallpaperAgent afterwards.
+    /// Update Index.plist so both Desktop (home screen) and Idle (lock screen)
+    /// are Linked to the chosen aerial assetID.
+    /// Writes atomically. Caller is responsible for reloading WallpaperAgent.
     static func point(at assetID: String) throws {
         guard fm.fileExists(atPath: indexFile.path) else { return }
 
         guard let data = try? Data(contentsOf: indexFile) else { return }
-        var plist: Any = (try? PropertyListSerialization.propertyList(
-            from: data, format: nil)) ?? [String: Any]()
+        var outer = (try? PropertyListSerialization.propertyList(
+            from: data, format: nil)) as? [String: Any] ?? [String: Any]()
 
+        let configData = try PropertyListSerialization.data(
+            fromPropertyList: ["assetID": assetID],
+            format: .binary,
+            options: 0
+        )
+
+        let choice: [String: Any] = [
+            "Configuration": configData,
+            "Files": [Any](),
+            "Provider": "com.apple.wallpaper.choice.aerials"
+        ]
+
+        let now = Date()
+        let linked: [String: Any] = [
+            "Content": [
+                "Choices": [choice]
+            ],
+            "LastSet": now,
+            "LastUse": now
+        ]
+
+        // Link both lock screen (Idle) and desktop (Home screen)
+        for key in ["AllSpacesAndDisplays", "SystemDefault"] {
+            outer[key] = [
+                "Type": "linked",
+                "Linked": linked
+            ]
+        }
+
+        // Clear display overrides so desktop and lockscreen are unified
+        outer["Displays"] = [String: Any]()
+
+        var plist: Any = outer
         var count = 0
         walk(&plist, assetID: assetID, count: &count)
 
-        // Atomic write
-        let out  = try PropertyListSerialization.data(
+        // Atomic write in binary format
+        let out = try PropertyListSerialization.data(
             fromPropertyList: plist, format: .binary, options: 0)
         try out.write(to: indexFile, options: .atomic)
 
