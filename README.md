@@ -26,7 +26,7 @@
 <p align="center">
   <img src="assets/demo.gif" width="100%" alt="AerialMotion Live Wallpaper Demo" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.35);" />
   <br />
-  <sub>🌧️ <em>Live wallpaper motion on macOS • Sample video from <a href="https://www.pexels.com/video/shallow-focus-of-green-leaves-wet-with-rain-5487781/">Pexels</a> (<a href="https://www.pexels.com/download/video/5487781/">Download Video</a>)</em></sub>
+  <sub>🌧️ <em>Workflow: Click menu to choose video ➔ Select file & click Open ➔ Instant desktop live motion ➔ Seamless lock screen sync • Footage from <a href="https://www.pexels.com/video/shallow-focus-of-green-leaves-wet-with-rain-5487781/">Pexels</a> (<a href="https://www.pexels.com/download/video/5487781/">Download Video</a>)</em></sub>
 </p>
 
 ---
