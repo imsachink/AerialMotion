@@ -224,7 +224,13 @@ enum VideoProcessor {
         exportSession.shouldOptimizeForNetworkUse = true
 
         do {
-            try await exportSession.export(to: dest, as: .mov)
+            if #available(macOS 15.0, *) {
+                try await exportSession.export(to: dest, as: .mov)
+            } else {
+                exportSession.outputURL = dest
+                exportSession.outputFileType = .mov
+                await exportSession.export()
+            }
             return fm.fileExists(atPath: dest.path)
         } catch {
             return false
