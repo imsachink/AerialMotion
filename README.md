@@ -1,0 +1,136 @@
+<p align="center">
+  <img src="Resources/AppIcon.png" width="128" height="128" style="border-radius: 28px;" alt="AerialMotion App Icon" />
+</p>
+
+<h1 align="center">AerialMotion</h1>
+
+<p align="center">
+  <strong>Set any <code>.mp4</code> or <code>.mov</code> video as your native macOS desktop AND lock screen wallpaper.</strong>
+  <br />
+  <em>Native Swift 6 • Zero background daemon • Zero battery drain • ~0% idle CPU</em>
+</p>
+
+<p align="center">
+  <a href="https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg"><img src="https://img.shields.io/badge/Download-AerialMotion.dmg-007AFF?style=for-the-badge&logo=apple&logoColor=white" alt="Download AerialMotion.dmg" /></a>
+  <a href="#-requirements"><img src="https://img.shields.io/badge/macOS-14%2B%20%7C%20Sonoma%20%7C%20Sequoia-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS" /></a>
+  <a href="#-architecture"><img src="https://img.shields.io/badge/Swift-6.0-FA7343?style=for-the-badge&logo=swift&logoColor=white" alt="Swift 6" /></a>
+  <a href="#-performance--resource-usage"><img src="https://img.shields.io/badge/Idle%20CPU-0%25-brightgreen?style=for-the-badge" alt="0% CPU" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License" /></a>
+</p>
+
+<p align="center">
+  <img src="assets/hero_banner.jpg" width="100%" alt="AerialMotion Hero Banner" style="border-radius: 12px;" />
+</p>
+
+---
+
+## 💡 Why AerialMotion?
+
+Most live wallpaper apps for macOS run a continuous video playback loop in the background, constantly consuming **15%–40% CPU**, spinning fans, and draining battery. Moreover, third-party apps cannot touch the macOS lock screen.
+
+**AerialMotion takes a fundamentally different approach:**
+Instead of running a background player, it integrates your video directly into macOS's native Aerial wallpaper engine (`WallpaperAgent`).
+
+* ⚡ **macOS handles playback natively** using Apple Silicon dedicated media engines.
+* 🔒 **Seamless lock screen & desktop synchronization** — when you wake or lock your Mac, the video transitions fluidly just like Apple's official Aerial wallpapers.
+* 🔋 **~0% idle CPU** — the menu bar companion uses no background resources when idle.
+* 📦 **Zero external dependencies** — built with Apple's native **AVFoundation** and Cocoa frameworks. No Homebrew or external tools required.
+* 🛡 **100% reversible** — restore Apple's default wallpapers at any time with one click.
+
+---
+
+## ✨ Features
+
+- **Drag & Drop Simplicity**: Drop any `.mp4` or `.mov` file onto the menu bar window to apply.
+- **Lock Screen & Desktop Sync**: Both display the exact same video asset, synchronized seamlessly.
+- **Hardware-Accelerated Ingestion**: Remuxes video tracks natively via `AVAssetExportSession` with automatic audio stripping and thumbnail extraction.
+- **Custom Wallpaper Library**: Saves your favorite video wallpapers with quick 1-click switching.
+- **Sleek Menu Bar Experience**: Glassmorphic SwiftUI interface designed specifically for macOS Sonoma and Sequoia.
+- **Customizable Appearance**: Toggle between the vibrant full-color app icon and native monochrome menu bar glyph.
+- **Safe State Rollback**: Backs up your Apple wallpaper catalog before making modifications.
+
+---
+
+## 📋 Requirements
+
+1. **macOS 14 (Sonoma), 15 (Sequoia), or newer**
+2. **One official Apple Aerial wallpaper downloaded**:
+   * Open **System Settings** → **Wallpaper**.
+   * Click on any aerial video wallpaper (e.g., *Tahoe*, *Sonoma*, *Yosemite*) and let macOS download it once. This initializes Apple's local wallpaper asset catalog.
+
+> [!NOTE]
+> **No external dependencies needed!** Video remuxing and thumbnail extraction are handled natively via Apple's built-in `AVFoundation` and `/usr/bin/avconvert`.
+
+---
+
+## 📥 Download & Install (Easy Way)
+
+1. Download **[AerialMotion.dmg](https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg)** (Direct Download) or view [All Releases](https://github.com/imsachink/AerialMotion/releases).
+2. Double-click the `.dmg` — a custom installer window will appear:
+   <p align="center">
+     <img src="Resources/installer_background.png" width="80%" style="border-radius: 10px; margin: 12px 0;" alt="AerialMotion Installer" />
+   </p>
+3. Simply drag **AerialMotion** into the **Applications** shortcut.
+4. Open **AerialMotion** from Launchpad or Spotlight. It sits quietly in your top menu bar.
+
+> [!IMPORTANT]
+> **First Launch on macOS (Gatekeeper Quarantine):**  
+> Because AerialMotion is an independent open-source project without a paid corporate Apple Developer certificate, macOS Sequoia / Sonoma may prompt about untrusted downloads.  
+> To open the app immediately, run this one-line command in your **Terminal**:
+> ```bash
+> xattr -cr /Applications/AerialMotion.app
+> ```
+> *(Or right-click `AerialMotion.app` in Finder, hold `Option`, and select **Open** → **Open Anyway**).*
+
+---
+
+## 🚀 How to Use
+
+1. Click the **AerialMotion** icon in your top menu bar.
+2. **Drag and drop** any `.mp4` or `.mov` video file onto the drop zone.
+3. Your video becomes your active desktop and lock screen wallpaper instantly!
+4. Press `⌃ + ⌘ + Q` (Lock Screen) to enjoy seamless lock-screen playback.
+
+---
+
+<details>
+<summary>🛠 <strong>Developers: Build from Source</strong></summary>
+
+```bash
+git clone https://github.com/imsachink/AerialMotion.git
+cd AerialMotion
+
+# Build and install directly to /Applications
+make install
+
+# Or create a standalone DMG
+make dmg
+```
+
+| Command | Action |
+|---|---|
+| `make app` | Assembles the standalone `AerialMotion.app` bundle |
+| `make dmg` | Packages `AerialMotion.dmg` for distribution |
+| `make install` | Builds the app, copies to `/Applications`, and launches it |
+| `make clean` | Removes `.build` artifacts and generated DMGs |
+
+</details>
+
+---
+
+## ❓ FAQ & Troubleshooting
+
+### Why is my lock screen black while the desktop works?
+Make sure you have downloaded at least one official aerial wallpaper in **System Settings → Wallpaper**. macOS needs Apple's baseline cache initialized before it can play custom lock screen assets.
+
+### Do I need to install `ffmpeg` or Homebrew?
+**No.** AerialMotion has zero required external dependencies. It uses Apple's native **AVFoundation** and macOS's pre-installed `/usr/bin/avconvert` utility. (If you happen to already have `ffmpeg` installed, AerialMotion will opportunistically use it for stream-copying, but it is purely optional.)
+
+### How do I revert back to default Apple wallpapers?
+Click the gear icon (⚙️) in the AerialMotion menu bar window and select **Restore Apple Originals**.
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.

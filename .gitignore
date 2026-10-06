@@ -1,0 +1,35 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor & IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Swift Package Manager & Build artifacts
+.build/
+.swiftpm/
+*.app/
+*.o
+*.d
+*.dia
+*.dylib
+
+# Xcode & Developer artifacts
+*.xcworkspace/
+*.xcuserdata/
+DerivedData/
+
+# Archives & Temporary files
+*.log
+*.zip
+*.tar.gz
+*.dmg
+*.pkg
