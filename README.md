@@ -15,6 +15,7 @@
   <a href="#-requirements"><img src="https://img.shields.io/badge/macOS-14%2B%20%7C%20Sonoma%20%7C%20Sequoia-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS" /></a>
   <a href="#-architecture"><img src="https://img.shields.io/badge/Swift-6.0-FA7343?style=for-the-badge&logo=swift&logoColor=white" alt="Swift 6" /></a>
   <a href="#-performance--resource-usage"><img src="https://img.shields.io/badge/Idle%20CPU-0%25-brightgreen?style=for-the-badge" alt="0% CPU" /></a>
+  <a href="https://buymeacoffee.com/sachinkaundal"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License" /></a>
 </p>
 
@@ -155,7 +156,13 @@ Click the gear icon (⚙️) in the AerialMotion menu bar window and select **Re
 
 ## ⭐ Support the Project
 
-If AerialMotion made your Mac desktop and lock screen look better, please consider giving this repository a **Star (⭐)**! It helps more Mac users discover the project.
+If AerialMotion made your Mac desktop and lock screen look better, please consider giving this repository a **Star (⭐)** or buying me a coffee! It helps keep the project 100% free, ad-free, and actively maintained.
+
+<p align="left">
+  <a href="https://buymeacoffee.com/sachinkaundal" target="_blank">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="48" style="border-radius: 8px;" />
+  </a>
+</p>
 
 ---
 

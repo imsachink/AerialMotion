@@ -162,24 +162,47 @@ struct SettingsView: View {
                         }
                     }
 
-                    // ── About ──────────────────────────────────────────────
-                    section(title: "About") {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("AerialMotion")
-                                    .font(.system(size: 12, weight: .semibold))
-                                Text("video → macOS aerial wallpaper")
+                    // ── About & Support ────────────────────────────────────
+                    section(title: "About & Support") {
+                        VStack(spacing: 8) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("AerialMotion v1.0.0")
+                                        .font(.system(size: 12, weight: .semibold))
+                                    Text("Native live video wallpapers for macOS")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Button("GitHub") {
+                                    NSWorkspace.shared.open(
+                                        URL(string: "https://github.com/imsachink/AerialMotion")!)
+                                }
+                                .buttonStyle(.bordered)
+                                .font(.caption)
+                            }
+
+                            Divider()
+
+                            HStack {
+                                Text("Enjoying AerialMotion?")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
+                                Spacer()
+                                Button("Buy Me a Coffee ☕") {
+                                    NSWorkspace.shared.open(
+                                        URL(string: "https://buymeacoffee.com/sachinkaundal")!)
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .tint(Color.orange)
+                                .font(.caption)
                             }
-                            Spacer()
-                            Button("GitHub") {
-                                NSWorkspace.shared.open(
-                                    URL(string: "https://github.com/sachinkaundal/AerialMotion")!)
-                            }
-                            .buttonStyle(.borderless)
-                            .font(.caption)
                         }
+                        .padding(10)
+                        .background(
+                            Color.secondary.opacity(0.06),
+                            in: RoundedRectangle(cornerRadius: 8)
+                        )
                     }
                 }
                 .padding()
