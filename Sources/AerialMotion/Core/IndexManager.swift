@@ -44,64 +44,24 @@ enum IndexManager {
             ]
         }
 
-        // Clear display overrides so desktop and lockscreen are unified
+        // Clear display and Space overrides so all virtual desktops and screens inherit the linked aerial
         outer["Displays"] = [String: Any]()
+        outer["Spaces"]   = [String: Any]()
 
-        var plist: Any = outer
-        var count = 0
-        walk(&plist, assetID: assetID, count: &count)
+        // Remove stale Space UUID keys from root (e.g. 5F18E1BE-..., 9C570187-...)
+        for key in Array(outer.keys) {
+            if key != "AllSpacesAndDisplays" && key != "SystemDefault" && key != "Displays" && key != "Spaces" {
+                outer.removeValue(forKey: key)
+            }
+        }
 
         // Atomic write in binary format
         let out = try PropertyListSerialization.data(
-            fromPropertyList: plist, format: .binary, options: 0)
+            fromPropertyList: outer, format: .binary, options: 0)
         try out.write(to: indexFile, options: .atomic)
 
         // Touch so WallpaperAgent picks it up
         try fm.setAttributes([.modificationDate: Date()], ofItemAtPath: indexFile.path)
-    }
-
-    // MARK: - Recursive plist walker
-
-    private static func walk(_ node: inout Any, assetID: String, count: inout Int) {
-        if var dict = node as? [String: Any] {
-            let provider = dict["Provider"] as? String ?? ""
-            if provider.contains("aerial"), var cfg = dict["Configuration"] as? Data {
-                if var inner = (try? PropertyListSerialization.propertyList(
-                    from: cfg, format: nil)) as? [String: Any],
-                   inner["assetID"] != nil {
-                    inner["assetID"] = assetID
-                    if let newCfg = try? PropertyListSerialization.data(
-                        fromPropertyList: inner, format: .binary, options: 0) {
-                        cfg = newCfg
-                        dict["Configuration"] = cfg
-                        count += 1
-                    }
-                }
-            }
-            if dict["Desktop"] != nil || dict["Idle"] != nil {
-                let now = Date()
-                if var desktop = dict["Desktop"] as? [String: Any] {
-                    desktop["LastSet"] = now
-                    desktop["LastUse"] = now
-                    dict["Desktop"] = desktop
-                }
-                if var idle = dict["Idle"] as? [String: Any] {
-                    idle["LastSet"] = now
-                    idle["LastUse"] = now
-                    dict["Idle"] = idle
-                }
-            }
-
-            for key in dict.keys {
-                walk(&dict[key]!, assetID: assetID, count: &count)
-            }
-            node = dict
-        } else if var arr = node as? [Any] {
-            for i in arr.indices {
-                walk(&arr[i], assetID: assetID, count: &count)
-            }
-            node = arr
-        }
     }
 }
 
@@ -110,7 +70,6 @@ enum IndexManager {
 enum WallpaperAgent {
 
     /// Kill WallpaperAgent so it re-reads the updated config.
-    /// Sleeps 1.5s to prevent race condition where agent overwrites our changes.
     /// Non-blocking async so the UI thread remains responsive.
     static func reload() async {
         await withCheckedContinuation { continuation in

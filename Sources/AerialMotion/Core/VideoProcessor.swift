@@ -1,274 +1,256 @@
 import Foundation
 import AVFoundation
+import VideoToolbox
+import CoreMedia
 import AppKit
 
-// MARK: - VideoProcessor
-// Handles video remux/encode mp4 → mov and thumbnail extraction.
-// Uses native macOS AVFoundation & /usr/bin/avconvert by default (ZERO dependencies required).
-// ffmpeg is used opportunistically if already installed on the system.
+// MARK: - VideoProcessor errors
 
 enum VideoProcessorError: LocalizedError {
+    case unreadableVideo(String)
     case conversionFailed(String)
     case thumbnailFailed
 
     var errorDescription: String? {
         switch self {
-        case .conversionFailed(let msg):
-            return "Video conversion failed: \(msg)"
-        case .thumbnailFailed:
-            return "Could not extract thumbnail from video."
+        case .unreadableVideo(let m): return m
+        case .conversionFailed(let m): return m
+        case .thumbnailFailed: return "Could not generate wallpaper thumbnail."
         }
     }
 }
 
+// MARK: - VideoProcessor
+
 enum VideoProcessor {
 
-    // MARK: - Public entry point
+    private static var fm: FileManager { FileManager.default }
 
-    /// Converts source video to .mov and extracts thumbnail.
-    /// Progress callback is called on an arbitrary thread (caller wraps in @MainActor).
+    // MARK: - Main pipeline
+
     static func process(
         source: URL,
         item: WallpaperItem,
-        progress: @escaping (Double) -> Void
+        progress: @escaping @Sendable (Double) -> Void
     ) async throws {
+        // 1. Generate thumbnail
+        progress(0.1)
+        try await generateThumbnail(source: source, dest: item.libraryThumbURL)
 
-        // Ensure library dirs exist
-        try fm.createDirectory(at: libDir,      withIntermediateDirectories: true)
-        try fm.createDirectory(at: thumbLibDir, withIntermediateDirectories: true)
+        // 2. Hardware-accelerated 2-layer hierarchical HEVC conversion
+        // (Mandatory for macOS WallpaperAerialsExtension desktop & lockscreen)
+        progress(0.2)
+        try await convertVideo(source: source, dest: item.libraryVideoURL, progress: progress)
 
-        // Step 1: thumbnail (fast, extracted directly from video)
-        progress(0.05)
-        await extractThumbnail(source: source, dest: item.libraryThumbURL)
-        progress(0.20)
-
-        // Step 2: convert video (cached if already exists)
-        if fm.fileExists(atPath: item.libraryVideoURL.path),
-           let attrs = try? fm.attributesOfItem(atPath: item.libraryVideoURL.path),
-           (attrs[.size] as? Int64 ?? 0) > 0 {
-            progress(0.95)
-        } else {
-            try await convertVideo(source: source,
-                                   dest: item.libraryVideoURL,
-                                   progress: progress)
-        }
-        _ = await run("/usr/bin/xattr", "-cr", item.libraryVideoURL.path)
-        _ = await run("/usr/bin/xattr", "-cr", item.libraryThumbURL.path)
-        try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: item.libraryVideoURL.path)
-        try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: item.libraryThumbURL.path)
         progress(1.0)
     }
 
-    // MARK: - Thumbnail Extraction
-    // Priority: Native AVFoundation AVAssetImageGenerator -> ffmpeg fallback
+    // MARK: - Thumbnail extraction
 
-    private static func extractThumbnail(source: URL, dest: URL) async {
-        // 1. Native AVFoundation (built-in, no external tool needed)
-        if await extractThumbnailNative(source: source, dest: dest) {
-            return
-        }
-
-        // 2. ffmpeg fallback if present
-        if let ff = ffmpegPath() {
-            let r = await run(ff, "-y", "-loglevel", "error",
-                              "-ss", "1", "-i", source.path,
-                              "-vframes", "1", "-vf", "scale=640:-1", dest.path)
-            if r == 0 && fm.fileExists(atPath: dest.path) { return }
-
-            _ = await run(ff, "-y", "-loglevel", "error",
-                          "-i", source.path,
-                          "-vframes", "1", "-vf", "scale=640:-1", dest.path)
-        }
-    }
-
-    private static func extractThumbnailNative(source: URL, dest: URL) async -> Bool {
+    static func generateThumbnail(source: URL, dest: URL) async throws {
         let asset = AVURLAsset(url: source)
-        let generator = AVAssetImageGenerator(asset: asset)
-        generator.appliesPreferredTrackTransform = true
-        generator.maximumSize = CGSize(width: 640, height: 360)
+        let gen = AVAssetImageGenerator(asset: asset)
+        gen.appliesPreferredTrackTransform = true
+        gen.maximumSize = CGSize(width: 800, height: 450)
 
-        let time = CMTime(seconds: 1.0, preferredTimescale: 600)
-        var cgImage: CGImage? = nil
+        let targetSec = UserDefaults.standard.integer(forKey: "thumbnailAt")
+        let time = CMTime(seconds: Double(targetSec > 0 ? targetSec : 1), preferredTimescale: 600)
 
-        do {
-            let (img, _) = try await generator.image(at: time)
-            cgImage = img
-        } catch {
-            do {
-                let (img, _) = try await generator.image(at: .zero)
-                cgImage = img
-            } catch {
-                return false
-            }
+        guard let cgImage = try? await gen.image(at: time).image else {
+            throw VideoProcessorError.thumbnailFailed
         }
 
-        guard let validCgImage = cgImage else { return false }
-        let bitmapRep = NSBitmapImageRep(cgImage: validCgImage)
-        guard let pngData = bitmapRep.representation(using: .png, properties: [:]) else { return false }
-        do {
-            try pngData.write(to: dest)
-            return true
-        } catch {
-            return false
+        let rep = NSBitmapImageRep(cgImage: cgImage)
+        guard let pngData = rep.representation(using: .png, properties: [:]) else {
+            throw VideoProcessorError.thumbnailFailed
         }
+
+        try fm.createDirectory(at: dest.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try pngData.write(to: dest, options: .atomic)
+        try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: dest.path)
+        _ = await run("/usr/bin/xattr", "-cr", dest.path)
     }
 
-    private static func isSourceHEVC(source: URL) async -> Bool {
-        let asset = AVURLAsset(url: source)
-        guard let tracks = try? await asset.loadTracks(withMediaType: .video) else { return false }
-        for track in tracks {
-            guard let formatDescs = try? await track.load(.formatDescriptions) else { continue }
-            for desc in formatDescs {
-                let subType = CMFormatDescriptionGetMediaSubType(desc)
-                if subType == 0x68766331 || subType == 0x68657631 { // 'hvc1' or 'hev1'
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-    // MARK: - Video conversion
-    // Priority:
-    // 1. ffmpeg stream-copy (if installed)
-    // 2. Native macOS AVAssetExportSession
-    // 3. Built-in macOS /usr/bin/avconvert tool
-    // 4. ffmpeg VideoToolbox HEVC encoding
+    // MARK: - 2-layer Hierarchical HEVC Conversion
+    // Uses AVAssetWriter + VideoToolbox with BaseLayerFrameRate = srcFps / 2
+    // to produce TSA temporal sub-layers required by macOS WallpaperAerialsExtension
+    // so the desktop/home screen never turns black or gray.
 
     private static func convertVideo(
         source: URL, dest: URL,
-        progress: @escaping (Double) -> Void
+        progress: @escaping @Sendable (Double) -> Void
     ) async throws {
 
         let tmpDest = dest.deletingPathExtension().appendingPathExtension("tmp.mov")
         defer { try? fm.removeItem(at: tmpDest) }
 
-        let alreadyHEVC = await isSourceHEVC(source: source)
-
-        // If source is already valid HEVC (hvc1), stream-copy directly
-        if alreadyHEVC {
-            if let ff = ffmpegPath() {
-                progress(0.3)
-                let r = await run(ff, "-y", "-loglevel", "error",
-                                  "-i", source.path,
-                                  "-c:v", "copy", "-an",
-                                  "-movflags", "+faststart",
-                                  tmpDest.path)
-                if r == 0,
-                   let attrs = try? fm.attributesOfItem(atPath: tmpDest.path),
-                   (attrs[.size] as? Int64 ?? 0) > 0 {
-                    try? fm.removeItem(at: dest)
-                    try fm.moveItem(at: tmpDest, to: dest)
-                    _ = await run("/usr/bin/xattr", "-cr", dest.path)
-                    progress(0.95)
-                    return
-                }
-            }
-
-            if fm.fileExists(atPath: "/usr/bin/avconvert") {
-                progress(0.5)
-                let r = await run("/usr/bin/avconvert",
-                                  "-s", source.path,
-                                  "-o", tmpDest.path,
-                                  "-p", "PresetPassthrough",
-                                  "--replace")
-                if r == 0 && fm.fileExists(atPath: tmpDest.path) {
-                    try? fm.removeItem(at: dest)
-                    try fm.moveItem(at: tmpDest, to: dest)
-                    _ = await run("/usr/bin/xattr", "-cr", dest.path)
-                    progress(0.95)
-                    return
-                }
-            }
-        }
-
-        // If not HEVC (e.g. H.264/AVC1 or other format), encode to HEVC hvc1 (required by macOS lock screen)
-        progress(0.3)
-        if let ff = ffmpegPath() {
-            let r = await run(ff, "-y", "-loglevel", "error",
-                              "-i", source.path,
-                              "-c:v", "hevc_videotoolbox",
-                              "-tag:v", "hvc1",
-                              "-b:v", "18M",
-                              "-pix_fmt", "yuv420p",
-                              "-movflags", "+faststart",
-                              "-an",
-                              tmpDest.path)
-            if r == 0,
-               let attrs = try? fm.attributesOfItem(atPath: tmpDest.path),
-               (attrs[.size] as? Int64 ?? 0) > 0 {
-                try? fm.removeItem(at: dest)
-                try fm.moveItem(at: tmpDest, to: dest)
-                _ = await run("/usr/bin/xattr", "-cr", dest.path)
-                progress(0.95)
-                return
-            }
-        }
-
-        // Fallback: Built-in macOS /usr/bin/avconvert HEVC
-        progress(0.5)
-        if fm.fileExists(atPath: "/usr/bin/avconvert") {
-            let r = await run("/usr/bin/avconvert",
-                              "-s", source.path,
-                              "-o", tmpDest.path,
-                              "-p", "PresetHEVCHighestQuality",
-                              "--replace")
-            if r == 0 && fm.fileExists(atPath: tmpDest.path) {
-                try? fm.removeItem(at: dest)
-                try fm.moveItem(at: tmpDest, to: dest)
-                _ = await run("/usr/bin/xattr", "-cr", dest.path)
-                progress(0.95)
-                return
-            }
-        }
-
-        // Fallback: Native AVAssetExportSession HEVC
-        progress(0.7)
-        if await convertVideoAVFoundation(source: source, dest: tmpDest) {
-            if let attrs = try? fm.attributesOfItem(atPath: tmpDest.path),
-               (attrs[.size] as? Int64 ?? 0) > 0 {
-                try? fm.removeItem(at: dest)
-                try fm.moveItem(at: tmpDest, to: dest)
-                _ = await run("/usr/bin/xattr", "-cr", dest.path)
-                progress(0.95)
-                return
-            }
-        }
-
-        throw VideoProcessorError.conversionFailed(
-            "Unable to convert video. Please ensure this is a valid video file."
-        )
-    }
-
-    private static func convertVideoAVFoundation(source: URL, dest: URL) async -> Bool {
         let asset = AVURLAsset(url: source)
-        let isPassthroughCompatible = await AVAssetExportSession.compatibility(
-            ofExportPreset: AVAssetExportPresetPassthrough,
-            with: asset,
-            outputFileType: .mov
-        )
-        let preset = isPassthroughCompatible
-            ? AVAssetExportPresetPassthrough
-            : AVAssetExportPresetHEVCHighestQuality
-
-        guard let exportSession = AVAssetExportSession(asset: asset, presetName: preset) else {
-            return false
-        }
-
-        exportSession.shouldOptimizeForNetworkUse = true
-
+        let tracks: [AVAssetTrack]
         do {
-            if #available(macOS 15.0, *) {
-                try await exportSession.export(to: dest, as: .mov)
-            } else {
-                exportSession.outputURL = dest
-                exportSession.outputFileType = .mov
-                await exportSession.export()
-            }
-            return fm.fileExists(atPath: dest.path)
+            tracks = try await asset.loadTracks(withMediaType: .video)
         } catch {
-            return false
+            throw VideoProcessorError.unreadableVideo("Could not read video track: \(error.localizedDescription)")
         }
+
+        guard let videoTrack = tracks.first else {
+            throw VideoProcessorError.unreadableVideo("No video track found in file.")
+        }
+
+        let naturalSize = try await videoTrack.load(.naturalSize)
+        let preferredTransform = try await videoTrack.load(.preferredTransform)
+        let nominalFps = try await videoTrack.load(.nominalFrameRate)
+        let srcFps = Double(nominalFps > 0 ? nominalFps : 30)
+        let duration = try await asset.load(.duration)
+        let durationSec = duration.seconds
+
+        let targetWidth = 3840
+        let targetHeight = 2160
+
+        // Handle rotation / preferred transform
+        let orientedSize = naturalSize.applying(preferredTransform)
+        let srcW = abs(orientedSize.width)
+        let srcH = abs(orientedSize.height)
+
+        let scale = min(Double(targetWidth) / srcW, Double(targetHeight) / srcH)
+        let scaledW = srcW * scale
+        let scaledH = srcH * scale
+        let offsetX = (Double(targetWidth) - scaledW) / 2.0
+        let offsetY = (Double(targetHeight) - scaledH) / 2.0
+
+        let transform = preferredTransform
+            .concatenating(CGAffineTransform(scaleX: scale, y: scale))
+            .concatenating(CGAffineTransform(translationX: offsetX, y: offsetY))
+
+        let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
+        layerInstruction.setTransform(transform, at: .zero)
+
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = CMTimeRange(start: .zero, duration: duration)
+        instruction.backgroundColor = CGColor(red: 0, green: 0, blue: 0, alpha: 1)
+        instruction.layerInstructions = [layerInstruction]
+
+        let composition = AVMutableVideoComposition()
+        composition.renderSize = CGSize(width: targetWidth, height: targetHeight)
+        composition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(srcFps.rounded(), 1)))
+        composition.instructions = [instruction]
+
+        try? fm.removeItem(at: tmpDest)
+        try fm.createDirectory(at: tmpDest.deletingLastPathComponent(), withIntermediateDirectories: true)
+
+        let writer = try AVAssetWriter(outputURL: tmpDest, fileType: .mov)
+
+        // 2-layer hierarchical HEVC compression settings
+        let compression: [String: Any] = [
+            AVVideoAverageBitRateKey: 18_000_000,
+            AVVideoMaxKeyFrameIntervalKey: 60,
+            AVVideoExpectedSourceFrameRateKey: Int(srcFps.rounded()),
+            AVVideoProfileLevelKey: kVTProfileLevel_HEVC_Main10_AutoLevel as String,
+            AVVideoAllowFrameReorderingKey: true,
+            kVTCompressionPropertyKey_BaseLayerFrameRate as String: srcFps / 2.0,
+        ]
+
+        let outputSettings: [String: Any] = [
+            AVVideoCodecKey: AVVideoCodecType.hevc,
+            AVVideoWidthKey: targetWidth,
+            AVVideoHeightKey: targetHeight,
+            AVVideoColorPropertiesKey: [
+                AVVideoColorPrimariesKey: AVVideoColorPrimaries_ITU_R_709_2,
+                AVVideoTransferFunctionKey: AVVideoTransferFunction_ITU_R_709_2,
+                AVVideoYCbCrMatrixKey: AVVideoYCbCrMatrix_ITU_R_709_2,
+            ],
+            AVVideoCompressionPropertiesKey: compression,
+        ]
+
+        let writerInput = AVAssetWriterInput(mediaType: .video, outputSettings: outputSettings)
+        writerInput.expectsMediaDataInRealTime = false
+        writer.add(writerInput)
+
+        let reader = try AVAssetReader(asset: asset)
+        let readerSettings: [String: Any] = [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange,
+        ]
+        let trackOutput = AVAssetReaderVideoCompositionOutput(
+            videoTracks: [videoTrack],
+            videoSettings: readerSettings
+        )
+        trackOutput.videoComposition = composition
+        reader.add(trackOutput)
+
+        guard writer.startWriting() else {
+            throw VideoProcessorError.conversionFailed(writer.error?.localizedDescription ?? "writer.startWriting failed")
+        }
+        writer.startSession(atSourceTime: .zero)
+        guard reader.startReading() else {
+            throw VideoProcessorError.conversionFailed(reader.error?.localizedDescription ?? "reader.startReading failed")
+        }
+
+        final class AtomicState: @unchecked Sendable {
+            let lock = NSLock()
+            var isFinished = false
+            func finish() -> Bool {
+                lock.lock(); defer { lock.unlock() }
+                if isFinished { return false }
+                isFinished = true
+                return true
+            }
+        }
+        let state = AtomicState()
+
+        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
+            nonisolated(unsafe) let r = reader
+            nonisolated(unsafe) let to = trackOutput
+            nonisolated(unsafe) let wi = writerInput
+
+            let queue = DispatchQueue(label: "AerialMotion.encode")
+            wi.requestMediaDataWhenReady(on: queue) {
+                while wi.isReadyForMoreMediaData {
+                    if let sample = to.copyNextSampleBuffer() {
+                        if !wi.append(sample) {
+                            if state.finish() {
+                                wi.markAsFinished()
+                                cont.resume(throwing: VideoProcessorError.conversionFailed("Writer append failed: \(wi.description)"))
+                            }
+                            return
+                        }
+                        if durationSec > 0 {
+                            let pts = CMSampleBufferGetPresentationTimeStamp(sample).seconds
+                            if pts.isFinite {
+                                let frac = min(0.95, max(0.2, 0.2 + (pts / durationSec) * 0.75))
+                                progress(frac)
+                            }
+                        }
+                    } else {
+                        if state.finish() {
+                            wi.markAsFinished()
+                            if r.status == .failed {
+                                cont.resume(throwing: VideoProcessorError.conversionFailed(r.error?.localizedDescription ?? "Reader failed"))
+                            } else {
+                                cont.resume()
+                            }
+                        }
+                        return
+                    }
+                }
+            }
+        }
+
+        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
+            nonisolated(unsafe) let w = writer
+            w.finishWriting {
+                if w.status == .completed {
+                    cont.resume()
+                } else {
+                    cont.resume(throwing: VideoProcessorError.conversionFailed(
+                        w.error?.localizedDescription ?? "writer status \(w.status.rawValue)"
+                    ))
+                }
+            }
+        }
+
+        try? fm.removeItem(at: dest)
+        try fm.moveItem(at: tmpDest, to: dest)
+        try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: dest.path)
+        _ = await run("/usr/bin/xattr", "-cr", dest.path)
     }
 
     // MARK: - Helpers
