@@ -37,6 +37,17 @@ Instead of running a background player, it integrates your video directly into m
 * 📦 **Zero external dependencies** — built with Apple's native **AVFoundation** and Cocoa frameworks. No Homebrew or external tools required.
 * 🛡 **100% reversible** — restore Apple's default wallpapers at any time with one click.
 
+### 📊 How AerialMotion Compares
+
+| Feature | AerialMotion | Traditional Mac Wallpaper Apps |
+| :--- | :---: | :---: |
+| **Lock Screen Support** | **✅ Yes (Native Apple Aerial)** | ❌ Desktop only |
+| **Idle CPU Usage** | **⚡ ~0% (No background player)** | ⚠️ 15% – 35% constant drain |
+| **Battery Impact** | **🔋 Near-Zero (Hardware accelerated)** | ⚠️ Heavy battery drain |
+| **Mission Control Spaces** | **✨ Seamless (No visual glitches)** | ❌ Stuttering window overlays |
+| **System Integration** | ** Native macOS Aerial Engine** | Hacky borderless window |
+| **Cost & License** | **🎁 100% Free & Open Source (MIT)** | $2.99 – $9.99 / Paid Subscriptions |
+
 ---
 
 ## ✨ Features
@@ -93,6 +104,17 @@ Instead of running a background player, it integrates your video directly into m
 
 ---
 
+## 🎬 Where to Find Great 4K Wallpapers
+
+You can use any video file, but slow-motion, drone, or ambient loop videos look the most stunning as aerial wallpapers:
+
+* **[Pexels Videos](https://www.pexels.com/videos/)** — High-quality free 4K drone, nature, and aerial footage.
+* **[Pixabay](https://pixabay.com/videos/)** — Royalty-free 4K/UHD nature, landscape, and city loops.
+* **[r/cinemagraphs on Reddit](https://www.reddit.com/r/cinemagraphs/)** — Beautiful seamless loop animations.
+* **[Mixkit](https://mixkit.co/free-stock-video/)** — Free atmospheric landscapes and scenic video clips.
+
+---
+
 <details>
 <summary>🛠 <strong>Developers: Build from Source</strong></summary>
 
@@ -128,6 +150,18 @@ Make sure you have downloaded at least one official aerial wallpaper in **System
 
 ### How do I revert back to default Apple wallpapers?
 Click the gear icon (⚙️) in the AerialMotion menu bar window and select **Restore Apple Originals**.
+
+---
+
+## ⭐ Support the Project
+
+If AerialMotion made your Mac desktop and lock screen look better, please consider giving this repository a **Star (⭐)**! It helps more Mac users discover the project.
+
+---
+
+## 👤 Author
+
+Developed by **Sachin Kaundal** ([@imsachink](https://github.com/imsachink)).
 
 ---
 
