@@ -15,21 +15,11 @@ struct WallpaperCardView: View {
         cardContent
             .contentShape(RoundedRectangle(cornerRadius: 8))
             .onTapGesture {
-                store.activate(item)
+                if !showDeleteConfirm {
+                    store.activate(item)
+                }
             }
             .onHover { isHovered = $0 }
-            .confirmationDialog(
-                "Remove '\(item.name)'?",
-                isPresented: $showDeleteConfirm,
-                titleVisibility: .visible
-            ) {
-                Button("Remove", role: .destructive) {
-                    store.remove(item)
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This will delete the video from your AerialMotion library.")
-            }
     }
 
     // MARK: - Card layout
@@ -65,13 +55,18 @@ struct WallpaperCardView: View {
             .animation(.spring(response: 0.25), value: isActive)
 
             // Active badge
-            if isActive {
+            if isActive && !showDeleteConfirm {
                 activeBadge
             }
 
             // Delete button (on hover)
-            if isHovered {
+            if isHovered && !showDeleteConfirm {
                 deleteButton
+            }
+
+            // Inline in-card delete confirmation (prevents MenuBarExtra from collapsing)
+            if showDeleteConfirm {
+                deleteConfirmationOverlay
             }
         }
     }
@@ -136,7 +131,9 @@ struct WallpaperCardView: View {
 
     private var deleteButton: some View {
         Button {
-            showDeleteConfirm = true
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
+                showDeleteConfirm = true
+            }
         } label: {
             Image(systemName: "xmark.circle.fill")
                 .font(.system(size: 15))
@@ -146,5 +143,55 @@ struct WallpaperCardView: View {
         .padding(4)
         .transition(.opacity)
         .help("Remove '\(item.name)'")
+    }
+
+    // MARK: - In-Card Delete Confirmation Overlay
+
+    private var deleteConfirmationOverlay: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.ultraThinMaterial)
+
+            VStack(spacing: 8) {
+                Text("Remove video?")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.primary)
+
+                HStack(spacing: 8) {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            showDeleteConfirm = false
+                        }
+                    } label: {
+                        Text("Cancel")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.primary.opacity(0.08))
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                    }
+                    .buttonStyle(.plain)
+
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            showDeleteConfirm = false
+                        }
+                        store.remove(item)
+                    } label: {
+                        Text("Remove")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.red.opacity(0.85))
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(6)
+        }
+        .transition(.opacity.combined(with: .scale(scale: 0.95)))
     }
 }
