@@ -20,9 +20,7 @@ enum IndexManager {
         // Atomic write
         let out  = try PropertyListSerialization.data(
             fromPropertyList: plist, format: .binary, options: 0)
-        let tmp  = indexFile.appendingPathExtension("tmp")
-        try out.write(to: tmp)
-        _ = try fm.replaceItemAt(indexFile, withItemAt: tmp)
+        try out.write(to: indexFile, options: .atomic)
 
         // Touch so WallpaperAgent picks it up
         try fm.setAttributes([.modificationDate: Date()], ofItemAtPath: indexFile.path)

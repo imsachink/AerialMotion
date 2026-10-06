@@ -118,19 +118,19 @@ final class WallpaperStore: ObservableObject {
     // MARK: - Remove
 
     func remove(_ item: WallpaperItem) {
+        let remaining = items.filter { $0.id != item.id && $0.name != item.name }
+        items = remaining
+        if activeID == item.id {
+            activeID = remaining.first?.id
+        }
+        save()
+
         Task {
             do {
                 try await CatalogManager.remove(item: item)
-                // Point index at fallback
-                let remaining = items.filter { $0.id != item.id && $0.isInstalled }
-                let fallback  = remaining.first?.id ?? fallbackAerial
+                let fallback = remaining.first?.id ?? fallbackAerial
                 try IndexManager.point(at: fallback)
                 await WallpaperAgent.reload()
-                await MainActor.run {
-                    items.removeAll { $0.id == item.id }
-                    if activeID == item.id { activeID = remaining.first?.id }
-                    save()
-                }
             } catch {
                 await MainActor.run { errorMessage = error.localizedDescription }
             }
@@ -140,18 +140,15 @@ final class WallpaperStore: ObservableObject {
     // MARK: - Restore Apple originals
 
     func restore() {
+        items = []
+        activeID = nil
+        save()
+
         Task {
             do {
-                for item in items {
-                    try? await CatalogManager.remove(item: item)
-                }
+                try await CatalogManager.cleanAllCustomEntries()
                 try IndexManager.point(at: fallbackAerial)
                 await WallpaperAgent.reload()
-                await MainActor.run {
-                    items = []
-                    activeID = nil
-                    save()
-                }
             } catch {
                 await MainActor.run { errorMessage = error.localizedDescription }
             }
@@ -170,10 +167,7 @@ final class WallpaperStore: ObservableObject {
         let state = State(assets: assetsMap, dates: datesMap, activeID: activeID)
         if let data = try? JSONEncoder().encode(state) {
             try? fm.createDirectory(at: aerialMotionRoot, withIntermediateDirectories: true)
-            // Atomic write
-            let tmp = stateFile.appendingPathExtension("tmp")
-            try? data.write(to: tmp)
-            try? fm.moveItem(at: tmp, to: stateFile)
+            try? data.write(to: stateFile, options: .atomic)
         }
     }
 

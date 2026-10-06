@@ -52,6 +52,10 @@ enum VideoProcessor {
                                    dest: item.libraryVideoURL,
                                    progress: progress)
         }
+        _ = await run("/usr/bin/xattr", "-cr", item.libraryVideoURL.path)
+        _ = await run("/usr/bin/xattr", "-cr", item.libraryThumbURL.path)
+        try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: item.libraryVideoURL.path)
+        try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: item.libraryThumbURL.path)
         progress(1.0)
     }
 

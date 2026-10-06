@@ -47,6 +47,7 @@ enum CatalogManager {
         let dst = item.catalogVideoURL
         if fm.fileExists(atPath: dst.path) { try? fm.removeItem(at: dst) }
         try fm.copyItem(at: item.libraryVideoURL, to: dst)
+        try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: dst.path)
         _ = await VideoProcessor.run("/usr/bin/xattr", "-cr", dst.path)
 
         // Copy thumbnail
@@ -54,6 +55,7 @@ enum CatalogManager {
         if fm.fileExists(atPath: dstThumb.path) { try? fm.removeItem(at: dstThumb) }
         if fm.fileExists(atPath: item.libraryThumbURL.path) {
             try fm.copyItem(at: item.libraryThumbURL, to: dstThumb)
+            try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: dstThumb.path)
             _ = await VideoProcessor.run("/usr/bin/xattr", "-cr", dstThumb.path)
         }
 
@@ -78,8 +80,74 @@ enum CatalogManager {
 
         guard fm.fileExists(atPath: entriesFile.path) else { return }
         var catalog = try loadCatalog()
-        catalog["assets"] = (catalog["assets"] as? [[String: Any]] ?? [])
-            .filter { ($0["id"] as? String) != item.id }
+        var assets = catalog["assets"] as? [[String: Any]] ?? []
+        assets.removeAll {
+            ($0["id"] as? String) == item.id ||
+            ($0["accessibilityLabel"] as? String) == item.name
+        }
+        catalog["assets"] = assets
+
+        // Check if any custom AerialMotion assets remain
+        let remainingCustom = assets.filter {
+            (($0["categories"] as? [String])?.contains(catID) ?? false)
+        }
+
+        if remainingCustom.isEmpty {
+            var categories = catalog["categories"] as? [[String: Any]] ?? []
+            categories.removeAll { ($0["id"] as? String) == catID }
+            catalog["categories"] = categories
+        } else if let first = remainingCustom.first,
+                  let firstID = first["id"] as? String,
+                  let firstThumb = first["previewImage"] as? String {
+            if var cats = catalog["categories"] as? [[String: Any]] {
+                for i in cats.indices where cats[i]["id"] as? String == catID {
+                    cats[i]["representativeAssetID"] = firstID
+                    cats[i]["previewImage"] = firstThumb
+                    if var subs = cats[i]["subcategories"] as? [[String: Any]] {
+                        for j in subs.indices where subs[j]["id"] as? String == subID {
+                            subs[j]["representativeAssetID"] = firstID
+                            subs[j]["previewImage"] = firstThumb
+                        }
+                        cats[i]["subcategories"] = subs
+                    }
+                }
+                catalog["categories"] = cats
+            }
+        }
+
+        try writeCatalog(catalog)
+    }
+
+    // MARK: - Clean all custom entries
+
+    static func cleanAllCustomEntries() async throws {
+        guard fm.fileExists(atPath: entriesFile.path) else { return }
+        var catalog = try loadCatalog()
+        var assets = catalog["assets"] as? [[String: Any]] ?? []
+        let customAssets = assets.filter {
+            (($0["categories"] as? [String])?.contains(catID) ?? false) ||
+            (($0["localizedNameKey"] as? String)?.contains("Aerial") ?? false) ||
+            (($0["localizedNameKey"] as? String)?.contains("Mp4") ?? false)
+        }
+
+        for asset in customAssets {
+            if let id = asset["id"] as? String {
+                try? fm.removeItem(at: aerialsDir.appendingPathComponent("\(id).mov"))
+                try? fm.removeItem(at: thumbsDir.appendingPathComponent("\(id).png"))
+            }
+        }
+
+        let customIDs = Set(customAssets.compactMap { $0["id"] as? String })
+        assets.removeAll {
+            if let id = $0["id"] as? String { return customIDs.contains(id) }
+            return false
+        }
+        catalog["assets"] = assets
+
+        var categories = catalog["categories"] as? [[String: Any]] ?? []
+        categories.removeAll { ($0["id"] as? String) == catID }
+        catalog["categories"] = categories
+
         try writeCatalog(catalog)
     }
 
@@ -93,17 +161,13 @@ enum CatalogManager {
     }
 
     private static func writeCatalog(_ catalog: [String: Any]) throws {
-        // Backup once
         let bak = entriesFile.appendingPathExtension("aerialmotion-backup")
         if !fm.fileExists(atPath: bak.path) {
             try? fm.copyItem(at: entriesFile, to: bak)
         }
         let data = try JSONSerialization.data(withJSONObject: catalog,
                                               options: [.prettyPrinted, .sortedKeys])
-        // Atomic write
-        let tmp = entriesFile.appendingPathExtension("tmp")
-        try data.write(to: tmp)
-        _ = try fm.replaceItemAt(entriesFile, withItemAt: tmp)
+        try data.write(to: entriesFile, options: .atomic)
     }
 
     private static func ensureCategory(_ catalog: inout [String: Any]) {
@@ -143,7 +207,7 @@ enum CatalogManager {
             "categories":         [catID],
             "id":                 item.id,
             "includeInShuffle":   true,
-            "localizedNameKey":   "AerialMotion",
+            "localizedNameKey":   item.name,
             "pointsOfInterest":   [String: String](),
             "preferredOrder":     maxOrder + 1,
             "previewImage":       thumbURI,

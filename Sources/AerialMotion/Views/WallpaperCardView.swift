@@ -12,19 +12,24 @@ struct WallpaperCardView: View {
     private var isActive: Bool { store.activeID == item.id }
 
     var body: some View {
-        Button { store.activate(item) } label: { cardContent }
-        .buttonStyle(.plain)
-        .onHover { isHovered = $0 }
-        .confirmationDialog(
-            "Remove '\(item.name)'?",
-            isPresented: $showDeleteConfirm,
-            titleVisibility: .visible
-        ) {
-            Button("Remove", role: .destructive) { store.remove(item) }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("This will delete the video from your AerialMotion library.")
-        }
+        cardContent
+            .contentShape(RoundedRectangle(cornerRadius: 8))
+            .onTapGesture {
+                store.activate(item)
+            }
+            .onHover { isHovered = $0 }
+            .confirmationDialog(
+                "Remove '\(item.name)'?",
+                isPresented: $showDeleteConfirm,
+                titleVisibility: .visible
+            ) {
+                Button("Remove", role: .destructive) {
+                    store.remove(item)
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will delete the video from your AerialMotion library.")
+            }
     }
 
     // MARK: - Card layout
