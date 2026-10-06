@@ -43,7 +43,7 @@ app: build
   <key>LSUIElement</key><true/>\n\
   <key>NSHighResolutionCapable</key><true/>\n\
   <key>NSPrincipalClass</key><string>NSApplication</string>\n\
-  <key>NSHumanReadableCopyright</key><string>© 2025 AerialMotion contributors. MIT License.</string>\n\
+  <key>NSHumanReadableCopyright</key><string>© 2026 Sachin Kaundal. MIT License.</string>\n\
 </dict></plist>' > "$(APP_BUNDLE)/Contents/Info.plist"
 	@echo "→ Ad-hoc code signing $(APP_BUNDLE)..."
 	codesign --force --deep --sign - --timestamp=none "$(APP_BUNDLE)" || true
