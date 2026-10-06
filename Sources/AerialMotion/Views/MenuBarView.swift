@@ -7,6 +7,7 @@ import AppKit
 struct MenuBarView: View {
 
     @EnvironmentObject private var store: WallpaperStore
+    @EnvironmentObject private var liveDesktop: LiveDesktopManager
     @StateObject private var updateChecker = UpdateChecker.shared
     @State private var isTargeted = false
     @State private var showSettings = false
@@ -19,13 +20,19 @@ struct MenuBarView: View {
             VStack(spacing: 0) {
                 header
                 Divider().opacity(0.3)
+
+                if updateChecker.isUpdating {
+                    updatingBanner
+                    Divider().opacity(0.3)
+                }
+
                 scrollContent
                 Divider().opacity(0.3)
                 footer
             }
         }
         .frame(width: 380)
-        .frame(minHeight: 160, maxHeight: 520)
+        .frame(minHeight: 180, maxHeight: 540)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         // Whole-panel drop target
         .onDrop(of: [.fileURL], isTargeted: $isTargeted) { providers in
@@ -39,6 +46,7 @@ struct MenuBarView: View {
         .sheet(isPresented: $showSettings) {
             SettingsView()
                 .environmentObject(store)
+                .environmentObject(liveDesktop)
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenSettingsRequested"))) { _ in
             showSettings = true
@@ -50,29 +58,19 @@ struct MenuBarView: View {
             }
             .keyboardShortcut("q", modifiers: .command)
             .opacity(0)
-            .frame(width: 0, height: 0)
         )
-        // Error toast
-        .overlay(alignment: .bottom) {
-            if let err = store.errorMessage {
-                ErrorToast(message: err) { store.errorMessage = nil }
-                    .padding(.bottom, 48)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-        }
-        .animation(.spring(response: 0.3), value: store.errorMessage)
     }
 
     // MARK: - Header
 
     private var header: some View {
         HStack(spacing: 8) {
-            if let logo = AppLogo.image {
-                Image(nsImage: logo)
+            if let img = AppLogo.image {
+                Image(nsImage: img)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 18, height: 18)
-                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
             } else {
                 Image(systemName: "video.fill")
                     .font(.system(size: 14, weight: .semibold))
@@ -106,6 +104,69 @@ struct MenuBarView: View {
         .padding(.vertical, 10)
     }
 
+    // MARK: - In-App Update Banner
+
+    private var updatingBanner: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Image(systemName: "arrow.down.circle.fill")
+                    .foregroundStyle(.blue)
+                Text(updateChecker.updateStatus)
+                    .font(.system(size: 11, weight: .medium))
+                    .lineLimit(1)
+                Spacer()
+                Text(String(format: "%.0f%%", updateChecker.downloadProgress * 100))
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(.secondary)
+            }
+            ProgressView(value: updateChecker.downloadProgress)
+                .progressViewStyle(.linear)
+        }
+        .padding(10)
+        .background(Color.blue.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+        .padding(.horizontal, 12)
+        .padding(.top, 8)
+    }
+
+    // MARK: - Desktop Motion Quick Card
+
+    private var desktopMotionCard: some View {
+        HStack(spacing: 10) {
+            Image(systemName: liveDesktop.isPlaying ? "display" : "display.slash")
+                .font(.system(size: 15))
+                .foregroundStyle(liveDesktop.isPlaying ? .green : .secondary)
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Text("Desktop Live Motion")
+                        .font(.system(size: 12, weight: .medium))
+                    if liveDesktop.isEnabled && liveDesktop.pauseOnBattery {
+                        Image(systemName: "battery.100.bolt")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.green)
+                            .help("Battery saver active (pauses on battery)")
+                    }
+                }
+                Text(liveDesktop.statusDescription)
+                    .font(.system(size: 10))
+                    .foregroundStyle(liveDesktop.pauseReason != nil ? .orange : .secondary)
+            }
+
+            Spacer()
+
+            Toggle("", isOn: $liveDesktop.isEnabled)
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .controlSize(.mini)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(
+            Color.secondary.opacity(0.06),
+            in: RoundedRectangle(cornerRadius: 8)
+        )
+    }
+
     // MARK: - Scrollable content
 
     private var scrollContent: some View {
@@ -117,10 +178,13 @@ struct MenuBarView: View {
                         .padding(.top, 10)
                 }
 
+                desktopMotionCard
+                    .padding(.horizontal, 12)
+                    .padding(.top, CatalogManager.isSystemReady ? 10 : 0)
+
                 DropZoneView()
                     .environmentObject(store)
                     .padding(.horizontal, 12)
-                    .padding(.top, CatalogManager.isSystemReady ? 10 : 0)
 
                 if store.items.isEmpty && store.processingStatus.isEmpty {
                     emptyState
@@ -190,9 +254,13 @@ struct MenuBarView: View {
 
     private var footer: some View {
         HStack(spacing: 12) {
-            // Check for updates
+            // Check / Install updates directly in-app
             Button {
-                Task { await updateChecker.checkForUpdates(userInitiated: true) }
+                if updateChecker.updateAvailable {
+                    Task { await updateChecker.installUpdate() }
+                } else {
+                    Task { await updateChecker.checkForUpdates(userInitiated: true) }
+                }
             } label: {
                 HStack(spacing: 4) {
                     if updateChecker.isChecking {
@@ -203,13 +271,13 @@ struct MenuBarView: View {
                     } else {
                         Image(systemName: "arrow.triangle.2.circlepath")
                     }
-                    Text(updateChecker.updateAvailable ? "Update Available!" : "Check Updates")
-                        .font(.system(size: 11))
+                    Text(updateChecker.updateAvailable ? "Install Update" : "Check Updates")
+                        .font(.system(size: 11, weight: updateChecker.updateAvailable ? .medium : .regular))
                 }
                 .foregroundStyle(updateChecker.updateAvailable ? .green : .secondary)
             }
             .buttonStyle(.plain)
-            .help("Check GitHub for new AerialMotion updates")
+            .help(updateChecker.updateAvailable ? "Click to download and install update in-app" : "Check GitHub for new AerialMotion updates")
 
             if !store.items.isEmpty {
                 Button {

@@ -55,11 +55,17 @@ Instead of running a background player, it integrates your video directly into m
 
 - **Drag & Drop Simplicity**: Drop any `.mp4` or `.mov` file onto the menu bar window to apply.
 - **Lock Screen & Desktop Sync**: Both display the exact same video asset, synchronized seamlessly.
-- **Hardware-Accelerated Ingestion**: Remuxes video tracks natively via `AVAssetExportSession` with automatic audio stripping and thumbnail extraction.
+- **Continuous Desktop Live Motion**: Optional continuous live video playback on your Home Screen / Desktop.
+- **Ultra-Low Battery Saver (Wallspace-Style)**:
+  - 🔋 **Pause on Battery**: Pauses desktop motion automatically when running on MacBook battery to preserve runtime.
+  - ⚡ **Low Power Mode**: Automatically pauses when macOS Low Power Mode is engaged.
+  - 🪟 **Desktop Occlusion Sensing**: Drops to 0% CPU/GPU whenever full-screen windows or apps cover the desktop.
+  - 💤 **Sleep & Lock Sleep**: Pauses instantly when display sleeps or locks.
+- **1-Click In-App Auto-Updates**: Installs new versions directly in-app and relaunches automatically — zero browser navigation required.
+- **Hardware-Accelerated Ingestion**: Remuxes video tracks natively with 2-layer hierarchical HEVC encoding and zero CPU overhead.
 - **Custom Wallpaper Library**: Saves your favorite video wallpapers with quick 1-click switching.
-- **Sleek Menu Bar Experience**: Glassmorphic SwiftUI interface designed specifically for macOS Sonoma and Sequoia.
-- **Customizable Appearance**: Toggle between the vibrant full-color app icon and native monochrome menu bar glyph.
-- **Safe State Rollback**: Backs up your Apple wallpaper catalog before making modifications.
+- **Sleek Menu Bar Experience**: Glassmorphic SwiftUI interface with right-click menu, monochrome toggle, and global shortcuts.
+- **Safe State Rollback**: Restore Apple default wallpapers at any time with one click.
 
 ---
 

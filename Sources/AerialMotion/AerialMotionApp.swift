@@ -8,6 +8,7 @@ struct AerialMotionApp: App {
 
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var store = WallpaperStore.shared
+    @StateObject private var liveDesktop = LiveDesktopManager.shared
     @AppStorage("menuBarMonochrome") private var menuBarMonochrome: Bool = false
 
     var body: some Scene {
@@ -15,6 +16,7 @@ struct AerialMotionApp: App {
         MenuBarExtra {
             MenuBarView()
                 .environmentObject(store)
+                .environmentObject(liveDesktop)
         } label: {
             if let icon = currentMenuBarIcon {
                 Image(nsImage: icon)
@@ -54,6 +56,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                      withIntermediateDirectories: true)
         }
 
+        // Initialize Live Desktop engine if enabled
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            LiveDesktopManager.shared.startWithActiveWallpaper()
+        }
+
         // Attach right-click context menu to menu bar icon
         setupStatusBarRightClick()
     }
@@ -72,7 +79,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         globalRightClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.rightMouseUp]) { [weak self] event in
             guard let screen = NSScreen.main else { return }
             let mouseLoc = NSEvent.mouseLocation
-            // If right-clicked in top menu bar area (typically y >= height - 32)
+            // If right-clicked in top menu bar area (typically y >= height - 35)
             if mouseLoc.y >= (screen.frame.maxY - 35) {
                 self?.presentContextMenu(at: mouseLoc)
             }
@@ -99,7 +106,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func findButtonAndAttachGesture(in view: NSView) {
         if let button = view as? NSButton {
-            // Avoid adding duplicate gesture recognizers
             let alreadyHas = button.gestureRecognizers.contains { $0 is NSClickGestureRecognizer }
             if !alreadyHas {
                 let gesture = NSClickGestureRecognizer(target: self, action: #selector(handleStatusButtonRightClick(_:)))
@@ -127,6 +133,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(titleItem)
 
         menu.addItem(NSMenuItem.separator())
+
+        let desktopMotionItem = NSMenuItem(title: "Continuous Desktop Motion", action: #selector(toggleDesktopMotionAction), keyEquivalent: "d")
+        desktopMotionItem.target = self
+        desktopMotionItem.state = LiveDesktopManager.shared.isEnabled ? .on : .off
+        menu.addItem(desktopMotionItem)
 
         let updateItem = NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdatesAction), keyEquivalent: "u")
         updateItem.target = self
@@ -157,6 +168,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(quitItem)
 
         menu.popUp(positioning: nil, at: location, in: nil)
+    }
+
+    @objc private func toggleDesktopMotionAction() {
+        LiveDesktopManager.shared.isEnabled.toggle()
     }
 
     @objc private func checkForUpdatesAction() {
@@ -190,7 +205,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        // Closing any window should NOT quit the app
         false
     }
 }

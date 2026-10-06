@@ -44,6 +44,13 @@ final class WallpaperStore: ObservableObject {
                           dateAdded: state.dates?[entry.key] ?? .distantPast)
         }.sorted { $0.name < $1.name }
         activeID = state.activeID
+
+        if let id = activeID, let item = items.first(where: { $0.id == id }) {
+            let videoURL = fm.fileExists(atPath: item.libraryVideoURL.path) ? item.libraryVideoURL : item.catalogVideoURL
+            if fm.fileExists(atPath: videoURL.path) {
+                LiveDesktopManager.shared.setVideoURL(videoURL)
+            }
+        }
     }
 
     // MARK: - Add a new video
@@ -79,6 +86,8 @@ final class WallpaperStore: ObservableObject {
                     processingStatus[name] = .done
                     activeID = id
                     save()
+                    let videoURL = fm.fileExists(atPath: item.libraryVideoURL.path) ? item.libraryVideoURL : item.catalogVideoURL
+                    LiveDesktopManager.shared.setVideoURL(videoURL)
                 }
                 try? await Task.sleep(for: .seconds(2))
                 await MainActor.run { [weak self] in
@@ -106,6 +115,8 @@ final class WallpaperStore: ObservableObject {
                 await MainActor.run {
                     activeID = item.id
                     save()
+                    let videoURL = fm.fileExists(atPath: item.libraryVideoURL.path) ? item.libraryVideoURL : item.catalogVideoURL
+                    LiveDesktopManager.shared.setVideoURL(videoURL)
                 }
             } catch {
                 await MainActor.run {
@@ -122,6 +133,12 @@ final class WallpaperStore: ObservableObject {
         items = remaining
         if activeID == item.id {
             activeID = remaining.first?.id
+            if let nextItem = remaining.first {
+                let videoURL = fm.fileExists(atPath: nextItem.libraryVideoURL.path) ? nextItem.libraryVideoURL : nextItem.catalogVideoURL
+                LiveDesktopManager.shared.setVideoURL(videoURL)
+            } else {
+                LiveDesktopManager.shared.stopPlayback()
+            }
         }
         save()
 
@@ -143,6 +160,7 @@ final class WallpaperStore: ObservableObject {
         items = []
         activeID = nil
         save()
+        LiveDesktopManager.shared.stopPlayback()
 
         Task {
             do {

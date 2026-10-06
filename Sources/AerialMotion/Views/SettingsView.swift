@@ -8,6 +8,7 @@ struct SettingsView: View {
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: WallpaperStore
+    @EnvironmentObject private var liveDesktop: LiveDesktopManager
     @StateObject private var updateChecker = UpdateChecker.shared
 
     @AppStorage("thumbnailAt")       private var thumbnailAt: Int = 1
@@ -42,16 +43,87 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
 
+                        // ── Desktop Motion & Battery ──────────────────────
+                        section(title: "Desktop Motion & Battery") {
+                            VStack(spacing: 10) {
+                                row(
+                                    label: "Play Motion on Home Screen",
+                                    description: "Continuously loop wallpaper video on the desktop"
+                                ) {
+                                    Toggle("", isOn: $liveDesktop.isEnabled)
+                                        .labelsHidden()
+                                        .toggleStyle(.switch)
+                                }
+
+                                if liveDesktop.isEnabled {
+                                    Divider()
+
+                                    row(
+                                        label: "Pause when on Battery",
+                                        description: "Preserve battery runtime by pausing desktop video when unplugged"
+                                    ) {
+                                        Toggle("", isOn: $liveDesktop.pauseOnBattery)
+                                            .labelsHidden()
+                                            .toggleStyle(.switch)
+                                    }
+
+                                    Divider()
+
+                                    row(
+                                        label: "Pause in Low Power Mode",
+                                        description: "Pause playback whenever macOS Low Power Mode is on"
+                                    ) {
+                                        Toggle("", isOn: $liveDesktop.pauseInLowPowerMode)
+                                            .labelsHidden()
+                                            .toggleStyle(.switch)
+                                    }
+
+                                    Divider()
+
+                                    row(
+                                        label: "Pause when Desktop Obscured",
+                                        description: "Zero CPU & GPU when windows or full-screen apps cover desktop"
+                                    ) {
+                                        Toggle("", isOn: $liveDesktop.pauseWhenOccluded)
+                                            .labelsHidden()
+                                            .toggleStyle(.switch)
+                                    }
+
+                                    Divider()
+
+                                    HStack {
+                                        HStack(spacing: 6) {
+                                            Circle()
+                                                .fill(liveDesktop.isPlaying ? Color.green : (liveDesktop.pauseReason != nil ? Color.orange : Color.secondary))
+                                                .frame(width: 8, height: 8)
+                                            Text("Engine Status:")
+                                                .font(.caption.weight(.medium))
+                                            Text(liveDesktop.statusDescription)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                        Spacer()
+                                    }
+                                    .padding(.vertical, 2)
+                                }
+                            }
+                            .padding(10)
+                            .background(
+                                Color.secondary.opacity(0.06),
+                                in: RoundedRectangle(cornerRadius: 8)
+                            )
+                        }
+
                         // ── Engine status ──────────────────────────────────
-                        section(title: "Engine Status") {
+                        section(title: "Hardware Acceleration") {
                             VStack(spacing: 6) {
                                 HStack {
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundStyle(.green)
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text("Apple Silicon Hardware Acceleration")
+                                        Text("Apple Silicon Media Engine")
                                             .font(.system(size: 12, weight: .medium))
-                                        Text("VideoToolbox 10-bit HEVC encoder active")
+                                        Text("Zero-copy GPU hardware decoding (~0.5% CPU)")
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
                                     }
@@ -123,7 +195,7 @@ struct SettingsView: View {
                         }
 
                         // ── Updates ────────────────────────────────────────
-                        section(title: "Software Updates") {
+                        section(title: "Updates") {
                             VStack(spacing: 8) {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
@@ -142,17 +214,41 @@ struct SettingsView: View {
                                     Spacer()
 
                                     Button {
-                                        Task { await updateChecker.checkForUpdates(userInitiated: true) }
+                                        if updateChecker.updateAvailable {
+                                            Task { await updateChecker.installUpdate() }
+                                        } else {
+                                            Task { await updateChecker.checkForUpdates(userInitiated: true) }
+                                        }
                                     } label: {
                                         if updateChecker.isChecking {
                                             ProgressView().controlSize(.small)
+                                        } else if updateChecker.isUpdating {
+                                            ProgressView().controlSize(.small)
                                         } else {
-                                            Text(updateChecker.updateAvailable ? "Download" : "Check Now")
+                                            Text(updateChecker.updateAvailable ? "Install Update" : "Check Now")
                                                 .font(.caption)
                                         }
                                     }
                                     .buttonStyle(.borderedProminent)
                                     .tint(updateChecker.updateAvailable ? .green : .accentColor)
+                                    .disabled(updateChecker.isChecking || updateChecker.isUpdating)
+                                }
+
+                                if updateChecker.isUpdating {
+                                    VStack(spacing: 4) {
+                                        ProgressView(value: updateChecker.downloadProgress)
+                                            .progressViewStyle(.linear)
+                                        HStack {
+                                            Text(updateChecker.updateStatus)
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
+                                            Spacer()
+                                            Text(String(format: "%.0f%%", updateChecker.downloadProgress * 100))
+                                                .font(.caption2.monospaced())
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+                                    .padding(.top, 4)
                                 }
                             }
                             .padding(10)
@@ -250,7 +346,7 @@ struct SettingsView: View {
                 }
             }
         }
-        .frame(width: 380, height: 520)
+        .frame(width: 400, height: 560)
     }
 
     // MARK: - Helpers
