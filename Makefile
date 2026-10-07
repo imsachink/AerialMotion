@@ -63,6 +63,8 @@ dmg: app
 	@echo "✓ $(DMG_NAME) created successfully!"
 
 install: app
+	@killall $(APP_NAME) 2>/dev/null || true
+	@sleep 0.5
 	cp -R $(APP_BUNDLE) /Applications/
 	xattr -cr /Applications/$(APP_BUNDLE)
 	@echo "✓ Installed to /Applications/$(APP_BUNDLE)"

@@ -70,7 +70,7 @@ Instead of running a background player, it integrates your video directly into m
 - **1-Click In-App Auto-Updates**: Installs new versions directly in-app and relaunches automatically — zero browser navigation required.
 - **Hardware-Accelerated Ingestion**: Remuxes video tracks natively with 2-layer hierarchical HEVC encoding and zero CPU overhead.
 - **Custom Wallpaper Library**: Saves your favorite video wallpapers with quick 1-click switching.
-- **Sleek Menu Bar Experience**: Glassmorphic SwiftUI interface with right-click menu, monochrome toggle, and global shortcuts.
+- **Sleek Menu Bar Experience**: Glassmorphic SwiftUI interface with 1-click controls, monochrome icon toggle, and keyboard shortcuts.
 - **Safe State Rollback**: Restore Apple default wallpapers at any time with one click.
 
 ---
