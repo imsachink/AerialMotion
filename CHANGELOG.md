@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.1.2] - 2026-10-07
+
+### 🐛 Bug Fixes & Improvements
+* **Removed Global Menu Bar Right-Click Monitors**: Completely removed top-edge event monitors and gesture recognizers that intercepted right-clicks across the macOS menu bar. The interface now operates via standard Mac 1-click popover.
+* **Seamless Process Lifecycle on Install**: Updated installation scripts to automatically terminate running instances before replacing the app in `/Applications`.
+
+---
+
 ## [v1.1.1] - 2026-10-06
 
 ### ✨ New Features

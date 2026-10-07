@@ -29,7 +29,7 @@ final class UpdateChecker: ObservableObject {
     @Published var lastChecked: Date?
 
     var currentVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1.1"
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1.2"
     }
 
     private let repo = "imsachink/AerialMotion"
