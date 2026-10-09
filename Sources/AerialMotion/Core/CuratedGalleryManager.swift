@@ -36,32 +36,32 @@ final class CuratedGalleryManager: ObservableObject {
     // MARK: - Catalog Loading
 
     func loadLocalCatalog() {
-        // 1. Try saved cached catalog from previous refresh
-        let cachedCatalogFile = baseDir.appendingPathComponent("cached_curated_catalog.json")
-        if let data = try? Data(contentsOf: cachedCatalogFile),
-           let decoded = try? JSONDecoder().decode([CuratedWallpaperItem].self, from: data),
-           !decoded.isEmpty {
-            self.items = decoded
-            return
-        }
-
-        // 2. Try Bundle resources
+        // 1. Load bundled or local development catalog as the baseline
+        var baseCatalog: [CuratedWallpaperItem] = []
         if let bundleURL = Bundle.main.url(forResource: "curated_catalog", withExtension: "json"),
            let data = try? Data(contentsOf: bundleURL),
            let decoded = try? JSONDecoder().decode([CuratedWallpaperItem].self, from: data) {
+            baseCatalog = decoded
+        } else {
+            let localDevPath = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+                .appendingPathComponent("Resources")
+                .appendingPathComponent("curated_catalog.json")
+            if let data = try? Data(contentsOf: localDevPath),
+               let decoded = try? JSONDecoder().decode([CuratedWallpaperItem].self, from: data) {
+                baseCatalog = decoded
+            }
+        }
+
+        // 2. Try saved cached catalog from previous remote refresh if larger or equal
+        let cachedCatalogFile = baseDir.appendingPathComponent("cached_curated_catalog.json")
+        if let data = try? Data(contentsOf: cachedCatalogFile),
+           let decoded = try? JSONDecoder().decode([CuratedWallpaperItem].self, from: data),
+           decoded.count >= baseCatalog.count {
             self.items = decoded
             return
         }
 
-        // 3. Try local development directory
-        let localDevPath = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-            .appendingPathComponent("Resources")
-            .appendingPathComponent("curated_catalog.json")
-        if FileManager.default.fileExists(atPath: localDevPath.path),
-           let data = try? Data(contentsOf: localDevPath),
-           let decoded = try? JSONDecoder().decode([CuratedWallpaperItem].self, from: data) {
-            self.items = decoded
-        }
+        self.items = baseCatalog
     }
 
     func refreshRemoteCatalog() async {

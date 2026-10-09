@@ -52,12 +52,19 @@ public struct CuratedWallpaperItem: Identifiable, Codable, Equatable {
                let img = NSImage(contentsOf: bundleURL) {
                 return img
             }
-            // Check assets directory if running in dev
+            // Check assets or Resources directory if running in dev
             let devAssetPath = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
                 .appendingPathComponent("assets")
                 .appendingPathComponent(thumbName)
             if FileManager.default.fileExists(atPath: devAssetPath.path),
                let img = NSImage(contentsOf: devAssetPath) {
+                return img
+            }
+            let devResPath = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+                .appendingPathComponent("Resources")
+                .appendingPathComponent(thumbName)
+            if FileManager.default.fileExists(atPath: devResPath.path),
+               let img = NSImage(contentsOf: devResPath) {
                 return img
             }
         }
