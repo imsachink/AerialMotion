@@ -91,13 +91,24 @@ final class CuratedGalleryManager: ObservableObject {
 
     // MARK: - Check Status
 
+    func findExisting(item: CuratedWallpaperItem, store: WallpaperStore) -> WallpaperItem? {
+        let localName = item.localFileName.map { ($0 as NSString).deletingPathExtension }
+        return store.items.first {
+            $0.name == item.name ||
+            $0.name == item.id ||
+            $0.name.lowercased() == item.id.lowercased() ||
+            $0.name == localName ||
+            $0.name.replacingOccurrences(of: "-", with: " ").lowercased() == item.name.lowercased()
+        }
+    }
+
     func isDownloaded(item: CuratedWallpaperItem) -> Bool {
         let target = cacheFile(for: item)
         return FileManager.default.fileExists(atPath: target.path)
     }
 
     func isInLibrary(item: CuratedWallpaperItem, store: WallpaperStore) -> Bool {
-        return store.items.contains { $0.name == item.name }
+        return findExisting(item: item, store: store) != nil
     }
 
     func isApplied(item: CuratedWallpaperItem, store: WallpaperStore) -> Bool {
@@ -105,14 +116,17 @@ final class CuratedGalleryManager: ObservableObject {
               let activeItem = store.items.first(where: { $0.id == activeID }) else {
             return false
         }
-        return activeItem.name == item.name
+        if let existing = findExisting(item: item, store: store) {
+            return existing.id == activeItem.id
+        }
+        return false
     }
 
     // MARK: - Download and Apply
 
     func downloadAndApply(item: CuratedWallpaperItem, store: WallpaperStore) {
         // 1. If already in Library, activate directly!
-        if let existing = store.items.first(where: { $0.name == item.name }) {
+        if let existing = findExisting(item: item, store: store) {
             store.activate(existing)
             return
         }
@@ -120,7 +134,7 @@ final class CuratedGalleryManager: ObservableObject {
         // 2. If already downloaded in cache, add to store
         let cached = cacheFile(for: item)
         if FileManager.default.fileExists(atPath: cached.path) {
-            store.add(url: cached)
+            store.add(url: cached, displayName: item.name)
             return
         }
 
@@ -138,7 +152,7 @@ final class CuratedGalleryManager: ObservableObject {
             if FileManager.default.fileExists(atPath: candidate.path) {
                 try? FileManager.default.removeItem(at: cached)
                 if (try? FileManager.default.copyItem(at: candidate, to: cached)) != nil {
-                    store.add(url: cached)
+                    store.add(url: cached, displayName: item.name)
                     return
                 }
             }
@@ -169,7 +183,7 @@ final class CuratedGalleryManager: ObservableObject {
                     do {
                         try? FileManager.default.removeItem(at: cached)
                         try FileManager.default.moveItem(at: downloadedURL, to: cached)
-                        store.add(url: cached)
+                        store.add(url: cached, displayName: item.name)
                     } catch {
                         self.errorMessage = "Failed to save video: \(error.localizedDescription)"
                     }

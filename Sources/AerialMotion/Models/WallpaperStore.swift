@@ -55,12 +55,18 @@ final class WallpaperStore: ObservableObject {
 
     // MARK: - Add a new video
 
-    func add(url: URL) {
-        let name = url.deletingPathExtension().lastPathComponent
+    func add(url: URL, displayName: String? = nil) {
+        let defaultName = url.deletingPathExtension().lastPathComponent
+        let name = displayName ?? defaultName
 
-        // Avoid duplicates
-        if items.contains(where: { $0.name == name }) {
-            errorMessage = "'\(name)' is already in your library."
+        // If already in library, activate directly!
+        if let existing = items.first(where: {
+            $0.name == name ||
+            $0.name == defaultName ||
+            $0.name.lowercased() == defaultName.lowercased() ||
+            $0.name.replacingOccurrences(of: "-", with: " ").lowercased() == name.lowercased()
+        }) {
+            activate(existing)
             return
         }
 
@@ -68,22 +74,34 @@ final class WallpaperStore: ObservableObject {
         let item = WallpaperItem(id: id, name: name, dateAdded: .now)
         items.append(item)
         processingStatus[name] = .converting(progress: 0)
+        if name != defaultName {
+            processingStatus[defaultName] = .converting(progress: 0)
+        }
 
         Task {
             do {
                 try await VideoProcessor.process(source: url, item: item) { @Sendable p in
                     Task { @MainActor [weak self] in
                         self?.processingStatus[name] = .converting(progress: p)
+                        if name != defaultName {
+                            self?.processingStatus[defaultName] = .converting(progress: p)
+                        }
                     }
                 }
                 await MainActor.run {
                     processingStatus[name] = .installing
+                    if name != defaultName {
+                        processingStatus[defaultName] = .installing
+                    }
                 }
                 try await CatalogManager.install(item: item)
                 try IndexManager.point(at: id)
                 await WallpaperAgent.reload()
                 await MainActor.run {
                     processingStatus[name] = .done
+                    if name != defaultName {
+                        processingStatus[defaultName] = .done
+                    }
                     activeID = id
                     save()
                     let videoURL = fm.fileExists(atPath: item.libraryVideoURL.path) ? item.libraryVideoURL : item.catalogVideoURL
@@ -92,16 +110,21 @@ final class WallpaperStore: ObservableObject {
                 try? await Task.sleep(for: .seconds(2))
                 await MainActor.run { [weak self] in
                     self?.processingStatus[name] = nil
+                    self?.processingStatus[defaultName] = nil
                 }
             } catch {
                 await MainActor.run {
                     processingStatus[name] = .failed(error.localizedDescription)
+                    if name != defaultName {
+                        processingStatus[defaultName] = .failed(error.localizedDescription)
+                    }
                     items.removeAll { $0.id == id }
                     errorMessage = error.localizedDescription
                 }
                 try? await Task.sleep(for: .seconds(4))
                 await MainActor.run { [weak self] in
                     self?.processingStatus[name] = nil
+                    self?.processingStatus[defaultName] = nil
                     if self?.errorMessage == error.localizedDescription {
                         self?.errorMessage = nil
                     }

@@ -234,6 +234,22 @@ struct SettingsView: View {
                                     .disabled(updateChecker.isChecking || updateChecker.isUpdating)
                                 }
 
+                                if updateChecker.updateAvailable && !updateChecker.releaseNotes.isEmpty {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("What's New in this update:")
+                                            .font(.caption.weight(.semibold))
+                                        ScrollView {
+                                            Text(updateChecker.releaseNotes)
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                        }
+                                        .frame(maxHeight: 70)
+                                    }
+                                    .padding(6)
+                                    .background(Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 6))
+                                }
+
                                 if updateChecker.isUpdating {
                                     VStack(spacing: 4) {
                                         ProgressView(value: updateChecker.downloadProgress)
@@ -289,6 +305,13 @@ struct SettingsView: View {
                                             .foregroundStyle(.secondary)
                                     }
                                     Spacer()
+                                    Button("Release Notes") {
+                                        NSWorkspace.shared.open(
+                                            URL(string: "https://github.com/imsachink/AerialMotion/releases/tag/v\(updateChecker.currentVersion)")!)
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .font(.caption)
+
                                     Button("GitHub") {
                                         NSWorkspace.shared.open(
                                             URL(string: "https://github.com/imsachink/AerialMotion")!)

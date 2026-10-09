@@ -23,6 +23,13 @@ struct CuratedCardView: View {
         gallery.downloadingIDs.contains(item.id)
     }
 
+    private var isProcessing: Bool {
+        if let existing = gallery.findExisting(item: item, store: store) {
+            return store.processingStatus[existing.name] != nil
+        }
+        return store.processingStatus[item.name] != nil || store.processingStatus[item.id] != nil
+    }
+
     private var progress: Double {
         gallery.downloadProgress[item.id] ?? 0.0
     }
@@ -200,7 +207,11 @@ struct CuratedCardView: View {
                     gallery.downloadAndApply(item: item, store: store)
                 } label: {
                     HStack(spacing: 4) {
-                        if isApplied {
+                        if isProcessing {
+                            ProgressView()
+                                .controlSize(.mini)
+                            Text("Setting...")
+                        } else if isApplied {
                             Image(systemName: "checkmark")
                             Text("Applied")
                         } else if isInLibrary {
@@ -217,8 +228,8 @@ struct CuratedCardView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
-                .tint(isApplied ? Color.secondary.opacity(0.3) : (isInLibrary ? Color.blue : Color.accentColor))
-                .disabled(isApplied)
+                .tint(isApplied ? Color.secondary.opacity(0.3) : (isProcessing ? Color.orange : (isInLibrary ? Color.blue : Color.accentColor)))
+                .disabled(isApplied || isProcessing)
                 .padding(.top, 2)
             }
         }
