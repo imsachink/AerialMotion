@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.2.0] - 2026-10-09
+
+### ✨ New Features
+* **Discover 4K Curated Community Gallery**: Added an in-app gallery tab showcasing verified, non-dizzy, slow-motion CC0 video wallpapers with 1-click download and instant apply.
+* **Dynamic Live Catalog Refresh**: Added a live **Sync (🔄)** button that pulls updated catalog manifests from GitHub with cache-busting, allowing new open-source community wallpapers to appear without requiring app updates.
+* **Native Fast Downloader with Stop/Cancel Control**: Replaced chunked loops with native `URLSessionDownloadTask` kernel streaming. Added an immediate **Stop Download** button to abort and clean up in-progress downloads at any time.
+* **Full-Area Interactive Tab Pills**: Upgraded navigation tabs (`My Library` vs `Discover 4K`) and category pills with generous hit testing (`.contentShape(Rectangle())`), ensuring instant responsiveness when clicking anywhere inside the button.
+
+---
+
 ## [v1.1.2] - 2026-10-07
 
 ### 🐛 Bug Fixes & Improvements

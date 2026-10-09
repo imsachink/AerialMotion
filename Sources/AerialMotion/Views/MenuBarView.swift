@@ -12,6 +12,13 @@ struct MenuBarView: View {
     @State private var isTargeted = false
     @State private var showSettings = false
 
+    enum ContentTab: String, CaseIterable {
+        case library = "My Library"
+        case discover = "Discover 4K"
+    }
+
+    @State private var selectedTab: ContentTab = .library
+
     var body: some View {
         ZStack {
             VisualEffectBackground()
@@ -31,7 +38,7 @@ struct MenuBarView: View {
                 footer
             }
         }
-        .frame(width: 380, height: 490)
+        .frame(width: 380, height: 520)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         // Whole-panel drop target
         .onDrop(of: [.fileURL], isTargeted: $isTargeted) { providers in
@@ -191,6 +198,83 @@ struct MenuBarView: View {
 
     // MARK: - Scrollable content
 
+    // MARK: - Tab Selector
+
+    private var tabSelector: some View {
+        HStack(spacing: 8) {
+            tabButton(
+                title: "My Library",
+                icon: "folder.fill",
+                badge: store.items.isEmpty ? nil : "\(store.items.count)",
+                badgeColor: nil,
+                isSelected: selectedTab == .library
+            ) {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    selectedTab = .library
+                }
+            }
+
+            tabButton(
+                title: "Discover 4K",
+                icon: "sparkles",
+                badge: "Free",
+                badgeColor: Color.green,
+                isSelected: selectedTab == .discover
+            ) {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    selectedTab = .discover
+                }
+            }
+        }
+    }
+
+    private func tabButton(
+        title: String,
+        icon: String,
+        badge: String?,
+        badgeColor: Color?,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
+
+                Text(title)
+                    .font(.system(size: 11, weight: isSelected ? .semibold : .medium))
+                    .foregroundStyle(isSelected ? Color.primary : Color.secondary)
+
+                if let b = badge {
+                    Text(b)
+                        .font(.system(size: 8.5, weight: .bold))
+                        .foregroundStyle(badgeColor != nil ? Color.white : Color.secondary)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 1.5)
+                        .background(
+                            Capsule()
+                                .fill(badgeColor ?? Color.primary.opacity(0.08))
+                        )
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 7)
+            .background(
+                RoundedRectangle(cornerRadius: 7)
+                    .fill(isSelected ? Color.primary.opacity(0.09) : Color.white.opacity(0.001))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 7)
+                    .strokeBorder(isSelected ? Color.primary.opacity(0.14) : Color.clear, lineWidth: 1)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Scrollable content
+
     private var scrollContent: some View {
         ScrollView(.vertical, showsIndicators: true) {
             VStack(spacing: 12) {
@@ -204,14 +288,23 @@ struct MenuBarView: View {
                     .padding(.horizontal, 12)
                     .padding(.top, CatalogManager.isSystemReady ? 10 : 0)
 
-                DropZoneView()
-                    .environmentObject(store)
+                tabSelector
                     .padding(.horizontal, 12)
 
-                if store.items.isEmpty && store.processingStatus.isEmpty {
-                    emptyState
+                if selectedTab == .library {
+                    DropZoneView()
+                        .environmentObject(store)
+                        .padding(.horizontal, 12)
+
+                    if store.items.isEmpty && store.processingStatus.isEmpty {
+                        emptyState
+                    } else {
+                        LibraryGridView()
+                            .environmentObject(store)
+                            .padding(.horizontal, 12)
+                    }
                 } else {
-                    LibraryGridView()
+                    CuratedGalleryView()
                         .environmentObject(store)
                         .padding(.horizontal, 12)
                 }

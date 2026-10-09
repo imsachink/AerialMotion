@@ -24,10 +24,7 @@ app: build
 	mkdir -p "$(APP_BUNDLE)/Contents/MacOS"
 	mkdir -p "$(APP_BUNDLE)/Contents/Resources"
 	cp $(BUILD_DIR)/$(APP_NAME) "$(APP_BUNDLE)/Contents/MacOS/$(APP_NAME)"
-	cp Resources/AppIcon.icns "$(APP_BUNDLE)/Contents/Resources/AppIcon.icns"
-	cp Resources/AppIcon.png "$(APP_BUNDLE)/Contents/Resources/AppIcon.png"
-	cp Resources/MenuBarIcon.png "$(APP_BUNDLE)/Contents/Resources/MenuBarIcon.png"
-	cp Resources/MenuBarTemplate.png "$(APP_BUNDLE)/Contents/Resources/MenuBarTemplate.png"
+	cp -R Resources/* "$(APP_BUNDLE)/Contents/Resources/"
 	@printf '<?xml version="1.0" encoding="UTF-8"?>\n\
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n\
 <plist version="1.0"><dict>\n\
@@ -37,7 +34,7 @@ app: build
   <key>CFBundleExecutable</key><string>$(APP_NAME)</string>\n\
   <key>CFBundleIconFile</key><string>AppIcon</string>\n\
   <key>CFBundlePackageType</key><string>APPL</string>\n\
-  <key>CFBundleShortVersionString</key><string>1.1.2</string>\n\
+  <key>CFBundleShortVersionString</key><string>1.2.0</string>\n\
   <key>CFBundleVersion</key><string>1</string>\n\
   <key>LSMinimumSystemVersion</key><string>15.0</string>\n\
   <key>LSUIElement</key><true/>\n\
@@ -45,6 +42,7 @@ app: build
   <key>NSPrincipalClass</key><string>NSApplication</string>\n\
   <key>NSHumanReadableCopyright</key><string>© 2026 Sachin Kaundal. MIT License.</string>\n\
 </dict></plist>' > "$(APP_BUNDLE)/Contents/Info.plist"
+	xattr -cr "$(APP_BUNDLE)"
 	@echo "→ Ad-hoc code signing $(APP_BUNDLE)..."
 	codesign --force --deep --sign - --timestamp=none "$(APP_BUNDLE)" || true
 	@echo "✓ $(APP_BUNDLE) ready — drag to /Applications or run: make install"

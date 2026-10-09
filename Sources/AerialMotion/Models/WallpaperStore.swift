@@ -99,6 +99,13 @@ final class WallpaperStore: ObservableObject {
                     items.removeAll { $0.id == id }
                     errorMessage = error.localizedDescription
                 }
+                try? await Task.sleep(for: .seconds(4))
+                await MainActor.run { [weak self] in
+                    self?.processingStatus[name] = nil
+                    if self?.errorMessage == error.localizedDescription {
+                        self?.errorMessage = nil
+                    }
+                }
             }
         }
     }

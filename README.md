@@ -81,7 +81,8 @@ AerialMotion follows [Semantic Versioning](https://semver.org/). See the complet
 
 | Version | Highlights | Status |
 | :---: | :--- | :---: |
-| **v1.1.2** | **Menu Bar Right-Click Fix**: Completely eliminated global top-edge click interception, restoring standard macOS 1-click popover interaction. | **Latest Release** |
+| **v1.2.0** | **Discover 4K Curated Gallery**: In-app curated open-source wallpaper browsing, live GitHub catalog sync (🔄), fast native streaming downloader, and 1-click cancel controls. | **Latest Release** |
+| **v1.1.2** | **Menu Bar Right-Click Fix**: Completely eliminated global top-edge click interception, restoring standard macOS 1-click popover interaction. | Stable |
 | **v1.1.1** | **1-Click Native File Picker** (`⌘N` or click anywhere on drop zone), proper Dock/Finder window layer ordering (`-2147483604`), and instant popover sizing. | Stable |
 | **v1.1.0** | **Continuous Desktop Live Motion** (`AVPlayerLayer`), Wallspace-style multi-tier **Battery Saver** (Pause on Battery, Low Power Mode, Window Occlusion Sensing), and direct **In-App Auto-Updater**. | Stable |
 | **v1.0.1** | Dual-layer hierarchical HEVC remuxing (`temporal_id=0/1`), Mission Control multi-space fix, and status bar context menu. | Archived |
