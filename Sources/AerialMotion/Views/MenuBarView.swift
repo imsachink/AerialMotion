@@ -10,7 +10,6 @@ struct MenuBarView: View {
     @EnvironmentObject private var liveDesktop: LiveDesktopManager
     @StateObject private var updateChecker = UpdateChecker.shared
     @State private var isTargeted = false
-    @State private var showSettings = false
 
     enum ContentTab: String, CaseIterable {
         case library = "My Library"
@@ -49,13 +48,8 @@ struct MenuBarView: View {
                 .strokeBorder(isTargeted ? Color.accentColor : Color.clear, lineWidth: 2)
                 .animation(.easeInOut(duration: 0.15), value: isTargeted)
         )
-        .sheet(isPresented: $showSettings) {
-            SettingsView()
-                .environmentObject(store)
-                .environmentObject(liveDesktop)
-        }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenSettingsRequested"))) { _ in
-            showSettings = true
+            SettingsWindowManager.shared.show()
         }
         // Hidden keyboard shortcut for Cmd+Q
         .background(
@@ -98,7 +92,7 @@ struct MenuBarView: View {
             .help("Add Video Wallpaper (⌘O)")
 
             Button {
-                showSettings = true
+                SettingsWindowManager.shared.show()
             } label: {
                 Image(systemName: "gearshape")
                     .font(.system(size: 13))
