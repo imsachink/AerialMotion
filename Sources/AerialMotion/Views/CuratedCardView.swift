@@ -159,6 +159,30 @@ struct CuratedCardView: View {
                         .font(.system(size: 9))
                         .lineLimit(1)
                         .foregroundStyle(.secondary)
+
+                    if let credit = item.credit {
+                        HStack(spacing: 2) {
+                            Text("Credit:")
+                                .font(.system(size: 8))
+                                .foregroundStyle(.tertiary)
+                            if let creditURL = item.creditURL, let url = URL(string: creditURL) {
+                                Button {
+                                    NSWorkspace.shared.open(url)
+                                } label: {
+                                    Text(credit)
+                                        .font(.system(size: 8, weight: .medium))
+                                        .foregroundStyle(Color.accentColor.opacity(0.85))
+                                        .underline()
+                                }
+                                .buttonStyle(.plain)
+                            } else {
+                                Text(credit)
+                                    .font(.system(size: 8, weight: .medium))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(.top, 1)
+                    }
                 }
 
                 Spacer()

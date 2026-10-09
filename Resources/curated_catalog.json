@@ -10,7 +10,54 @@
     "thumbnailName": "japanese_landscape_thumb.png",
     "thumbnailURL": "https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/japanese_landscape_thumb.png",
     "videoURL": "https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/japanese_landscape.mp4",
-    "localFileName": "japanese_landscape.mp4"
+    "localFileName": "japanese_landscape.mp4",
+    "credit": "Sachin Kaundal (Kling AI)",
+    "creditURL": "https://github.com/imsachink/AerialMotion"
+  },
+  {
+    "id": "space-orbital-station",
+    "name": "Cosmic Orbital Habitat",
+    "subtitle": "Earth Horizon & Porthole Window",
+    "category": "Space & Dark",
+    "resolution": "1080p Ambient",
+    "license": "Open Source",
+    "fileSizeMB": 3.3,
+    "thumbnailName": "space_orbital_station_thumb.png",
+    "thumbnailURL": "https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/space_orbital_station_thumb.png",
+    "videoURL": "https://raw.githubusercontent.com/usman-369/wallpapers/main/animated/misc/space-bedroom.1920x1080.mp4",
+    "localFileName": "space_orbital_station.mp4",
+    "credit": "usman-369 / GitHub",
+    "creditURL": "https://github.com/usman-369/wallpapers"
+  },
+  {
+    "id": "deep-space-nebula",
+    "name": "Deep Space Nebula",
+    "subtitle": "Celestial Starfield & Cosmic Dust",
+    "category": "Space & Dark",
+    "resolution": "1080p Ambient",
+    "license": "Open Source",
+    "fileSizeMB": 2.1,
+    "thumbnailName": "deep_space_nebula_thumb.png",
+    "thumbnailURL": "https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/deep_space_nebula_thumb.png",
+    "videoURL": "https://raw.githubusercontent.com/usman-369/wallpapers/main/animated/misc/galaxy-room.1920x1080.mp4",
+    "localFileName": "deep_space_nebula.mp4",
+    "credit": "usman-369 / GitHub",
+    "creditURL": "https://github.com/usman-369/wallpapers"
+  },
+  {
+    "id": "midnight-forest-rail",
+    "name": "Midnight Forest Signal",
+    "subtitle": "Snowfall & Signal Light • Dark Mood",
+    "category": "Space & Dark",
+    "resolution": "1080p Ambient",
+    "license": "Open Source",
+    "fileSizeMB": 2.2,
+    "thumbnailName": "midnight_forest_rail_thumb.png",
+    "thumbnailURL": "https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/midnight_forest_rail_thumb.png",
+    "videoURL": "https://raw.githubusercontent.com/usman-369/wallpapers/main/animated/scenery/night-railway.1920x1080.mp4",
+    "localFileName": "midnight_forest_rail.mp4",
+    "credit": "usman-369 / GitHub",
+    "creditURL": "https://github.com/usman-369/wallpapers"
   },
   {
     "id": "twilight-horizon",
@@ -23,7 +70,9 @@
     "thumbnailName": "twilight_horizon_thumb.png",
     "thumbnailURL": "https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/twilight_horizon_thumb.png",
     "videoURL": "https://raw.githubusercontent.com/usman-369/wallpapers/main/animated/scenery/sunset-over-silent-horizon.1920x1080.mp4",
-    "localFileName": "twilight_horizon.mp4"
+    "localFileName": "twilight_horizon.mp4",
+    "credit": "usman-369 / GitHub",
+    "creditURL": "https://github.com/usman-369/wallpapers"
   },
   {
     "id": "cozy-forest-cabin",
@@ -36,7 +85,9 @@
     "thumbnailName": "cozy_forest_cabin_thumb.png",
     "thumbnailURL": "https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/cozy_forest_cabin_thumb.png",
     "videoURL": "https://raw.githubusercontent.com/usman-369/wallpapers/main/animated/scenery/cozy-room.1920x1080.mp4",
-    "localFileName": "cozy_forest_cabin.mp4"
+    "localFileName": "cozy_forest_cabin.mp4",
+    "credit": "usman-369 / GitHub",
+    "creditURL": "https://github.com/usman-369/wallpapers"
   },
   {
     "id": "neon-rain-pod",
@@ -49,7 +100,9 @@
     "thumbnailName": "neon_rain_pod_thumb.png",
     "thumbnailURL": "https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/neon_rain_pod_thumb.png",
     "videoURL": "https://raw.githubusercontent.com/usman-369/wallpapers/main/animated/misc/cozy-bedroom-at-night.1920x1080.mp4",
-    "localFileName": "neon_rain_pod.mp4"
+    "localFileName": "neon_rain_pod.mp4",
+    "credit": "usman-369 / GitHub",
+    "creditURL": "https://github.com/usman-369/wallpapers"
   },
   {
     "id": "blue-forest-waterfalls",
@@ -62,7 +115,9 @@
     "thumbnailName": "blue_forest_waterfalls_thumb.png",
     "thumbnailURL": "https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/blue_forest_waterfalls_thumb.png",
     "videoURL": "https://raw.githubusercontent.com/usman-369/wallpapers/main/animated/scenery/blue-forest-waterfalls.1920x1080.mp4",
-    "localFileName": "blue_forest_waterfalls.mp4"
+    "localFileName": "blue_forest_waterfalls.mp4",
+    "credit": "usman-369 / GitHub",
+    "creditURL": "https://github.com/usman-369/wallpapers"
   },
   {
     "id": "golden-alpine-meadow",
@@ -75,6 +130,8 @@
     "thumbnailName": "golden_alpine_meadow_thumb.png",
     "thumbnailURL": "https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/golden_alpine_meadow_thumb.png",
     "videoURL": "https://raw.githubusercontent.com/usman-369/wallpapers/main/animated/scenery/field-near-mountains.1920x1080.mp4",
-    "localFileName": "golden_alpine_meadow.mp4"
+    "localFileName": "golden_alpine_meadow.mp4",
+    "credit": "usman-369 / GitHub",
+    "creditURL": "https://github.com/usman-369/wallpapers"
   }
 ]

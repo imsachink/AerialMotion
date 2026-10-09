@@ -59,6 +59,11 @@ Instead of running a background player, it integrates your video directly into m
 
 ## ✨ Features
 
+- **Discover 4K Curated Community Gallery**: In-app gallery to browse and download verified, calm ambient live wallpapers with 1-click download and instant apply.
+  - Filter across **🌌 Space & Dark**, **⛩️ Zen & Japan**, **🌧️ Cozy & Lo-Fi**, and **🌲 Deep Nature**.
+  - 100% free and open-source with full creator credits and source links.
+  - Dynamic **Sync (🔄)** button pulls newly added community wallpapers live from GitHub without app updates.
+- **Dedicated Native Settings Window**: Settings opens in its own centered macOS window, ensuring buttons, toggles, and folder navigation never collapse the interface.
 - **1-Click Picker & Drag-and-Drop**: Click the drop zone to open the native macOS file picker (`⌘N`) or simply drag and drop any `.mp4`, `.mov`, or `.m4v` video.
 - **Lock Screen & Desktop Sync**: Both display the exact same video asset, synchronized seamlessly.
 - **Continuous Desktop Live Motion**: Optional continuous live video playback on your Home Screen / Desktop.
@@ -81,7 +86,7 @@ AerialMotion follows [Semantic Versioning](https://semver.org/). See the complet
 
 | Version | Highlights | Status |
 | :---: | :--- | :---: |
-| **v1.2.0** | **Discover 4K Curated Gallery**: In-app curated open-source wallpaper browsing, live GitHub catalog sync (🔄), fast native streaming downloader, and 1-click cancel controls. | **Latest Release** |
+| **v1.2.0** | **Discover 4K Curated Gallery (9 Presets)**: In-app open-source wallpaper browsing across Space & Dark, Zen & Japan, Cozy & Lo-Fi, and Deep Nature with full creator credits, live GitHub catalog sync (🔄), dedicated Settings window, and fast cancelable streaming downloader. | **Latest Release** |
 | **v1.1.2** | **Menu Bar Right-Click Fix**: Completely eliminated global top-edge click interception, restoring standard macOS 1-click popover interaction. | Stable |
 | **v1.1.1** | **1-Click Native File Picker** (`⌘N` or click anywhere on drop zone), proper Dock/Finder window layer ordering (`-2147483604`), and instant popover sizing. | Stable |
 | **v1.1.0** | **Continuous Desktop Live Motion** (`AVPlayerLayer`), Wallspace-style multi-tier **Battery Saver** (Pause on Battery, Low Power Mode, Window Occlusion Sensing), and direct **In-App Auto-Updater**. | Stable |
@@ -196,6 +201,24 @@ If AerialMotion made your Mac desktop and lock screen look better, please consid
 ## 👤 Author
 
 Developed by **Sachin Kaundal** ([@imsachink](https://github.com/imsachink)).
+
+---
+
+## 🙏 Credits & Wallpapers Attribution
+
+AerialMotion's curated in-app gallery features high-quality, calm ambient loops from the open-source community with full credit:
+
+| Wallpaper | Category | Attribution | Source |
+| :--- | :--- | :--- | :--- |
+| **Japanese Garden Serenity** | ⛩️ Zen & Japan | **Sachin Kaundal** (Kling AI) | [AerialMotion](https://github.com/imsachink/AerialMotion) |
+| **Cosmic Orbital Habitat** | 🌌 Space & Dark | **usman-369** | [wallpapers](https://github.com/usman-369/wallpapers) |
+| **Deep Space Nebula** | 🌌 Space & Dark | **usman-369** | [wallpapers](https://github.com/usman-369/wallpapers) |
+| **Midnight Forest Signal** | 🌌 Space & Dark | **usman-369** | [wallpapers](https://github.com/usman-369/wallpapers) |
+| **Twilight Over Horizon** | ⛩️ Zen & Japan | **usman-369** | [wallpapers](https://github.com/usman-369/wallpapers) |
+| **Cozy Forest Cabin** | 🌧️ Cozy & Lo-Fi | **usman-369** | [wallpapers](https://github.com/usman-369/wallpapers) |
+| **Neon Rain Pod** | 🌧️ Cozy & Lo-Fi | **usman-369** | [wallpapers](https://github.com/usman-369/wallpapers) |
+| **Blue Forest Waterfalls** | 🌲 Deep Nature | **usman-369** | [wallpapers](https://github.com/usman-369/wallpapers) |
+| **Golden Alpine Meadow** | 🌲 Deep Nature | **usman-369** | [wallpapers](https://github.com/usman-369/wallpapers) |
 
 ---
 

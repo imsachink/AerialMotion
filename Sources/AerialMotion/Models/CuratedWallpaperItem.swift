@@ -16,6 +16,8 @@ public struct CuratedWallpaperItem: Identifiable, Codable, Equatable {
     public let thumbnailURL: String?
     public let videoURL: String
     public let localFileName: String?
+    public let credit: String?
+    public let creditURL: String?
 
     public init(
         id: String,
@@ -28,7 +30,9 @@ public struct CuratedWallpaperItem: Identifiable, Codable, Equatable {
         thumbnailName: String? = nil,
         thumbnailURL: String? = nil,
         videoURL: String,
-        localFileName: String? = nil
+        localFileName: String? = nil,
+        credit: String? = nil,
+        creditURL: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -41,6 +45,8 @@ public struct CuratedWallpaperItem: Identifiable, Codable, Equatable {
         self.thumbnailURL = thumbnailURL
         self.videoURL = videoURL
         self.localFileName = localFileName
+        self.credit = credit
+        self.creditURL = creditURL
     }
 
     /// Resolves local thumbnail from bundle or local cache if present

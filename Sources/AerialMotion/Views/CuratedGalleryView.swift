@@ -9,7 +9,7 @@ struct CuratedGalleryView: View {
     @ObservedObject var gallery = CuratedGalleryManager.shared
     @State private var selectedCategory: String = "All"
 
-    private let categories = ["All", "Zen & Japan", "Cozy & Lo-Fi", "Deep Nature"]
+    private let categories = ["All", "Space & Dark", "Zen & Japan", "Cozy & Lo-Fi", "Deep Nature"]
 
     private var filteredItems: [CuratedWallpaperItem] {
         if selectedCategory == "All" {
@@ -109,6 +109,7 @@ struct CuratedGalleryView: View {
 
     private func categoryLabel(_ cat: String) -> String {
         switch cat {
+        case "Space & Dark": return "🌌 Space & Dark"
         case "Zen & Japan": return "⛩️ Zen & Japan"
         case "Cozy & Lo-Fi": return "🌧️ Cozy & Lo-Fi"
         case "Deep Nature": return "🌲 Deep Nature"
