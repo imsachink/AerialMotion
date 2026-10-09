@@ -10,8 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v1.2.0] - 2026-10-09
 
 ### ✨ New Features
-* **Discover 4K Curated Community Gallery**: Added an in-app gallery tab showcasing verified, non-dizzy, slow-motion CC0 video wallpapers with 1-click download and instant apply.
-* **Dynamic Live Catalog Refresh**: Added a live **Sync (🔄)** button that pulls updated catalog manifests from GitHub with cache-busting, allowing new open-source community wallpapers to appear without requiring app updates.
+* **Discover 4K Curated Community Gallery**: Added an in-app gallery tab showcasing verified, non-dizzy, slow-motion CC0 / open-source video wallpapers with 1-click download and instant apply.
+* **Expanded Curated Wallpaper Lineup (6 Ambient Presets)**:
+  * ⛩️ **Zen & Japan**: *Japanese Garden Serenity* (4.4 MB) & *Twilight Over Horizon* (2.4 MB)
+  * 🌧️ **Cozy & Lo-Fi**: *Cozy Forest Cabin* (6.4 MB) & *Neon Rain Pod* (3.0 MB)
+  * 🌲 **Deep Nature**: *Blue Forest Waterfalls* (7.8 MB) & *Golden Alpine Meadow* (2.9 MB)
+* **Category Filtering**: Added quick filter pills (`✨ All`, `⛩️ Zen & Japan`, `🌧️ Cozy & Lo-Fi`, `🌲 Deep Nature`) for easy browsing.
+* **Dynamic Live Catalog Refresh**: Added a live **Sync (🔄)** button that pulls updated catalog manifests from GitHub with cache-busting, allowing new community wallpapers to appear without requiring app updates.
 * **Native Fast Downloader with Stop/Cancel Control**: Replaced chunked loops with native `URLSessionDownloadTask` kernel streaming. Added an immediate **Stop Download** button to abort and clean up in-progress downloads at any time.
 * **Full-Area Interactive Tab Pills**: Upgraded navigation tabs (`My Library` vs `Discover 4K`) and category pills with generous hit testing (`.contentShape(Rectangle())`), ensuring instant responsiveness when clicking anywhere inside the button.
 
