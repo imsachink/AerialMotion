@@ -11,13 +11,25 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg"><img src="https://img.shields.io/badge/Download-AerialMotion.dmg-007AFF?style=for-the-badge&logo=apple&logoColor=white" alt="Download AerialMotion.dmg" /></a>
-  <a href="https://imsachink.github.io/AerialMotion/"><img src="https://img.shields.io/badge/Website-Live%20Demo-5856D6?style=for-the-badge&logo=safari&logoColor=white" alt="Live Website" /></a>
-  <a href="#-requirements"><img src="https://img.shields.io/badge/macOS-14%2B%20%7C%20Sonoma%20%7C%20Sequoia-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS" /></a>
-  <a href="#-architecture"><img src="https://img.shields.io/badge/Swift-6.0-FA7343?style=for-the-badge&logo=swift&logoColor=white" alt="Swift 6" /></a>
-  <a href="#-performance--resource-usage"><img src="https://img.shields.io/badge/Idle%20CPU-0%25-brightgreen?style=for-the-badge" alt="0% CPU" /></a>
-  <a href="https://buymeacoffee.com/sachinkaundal"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License" /></a>
+  <a href="https://imsachink.github.io/AerialMotion/">
+    <img src="https://img.shields.io/badge/🌐_Live_Website_&_Demo-imsachink.github.io%2FAerialMotion-007AFF?style=for-the-badge&logo=safari&logoColor=white" height="38" alt="Live Website & Demo" />
+  </a>
+  &nbsp;
+  <a href="https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg">
+    <img src="https://img.shields.io/badge/Download_DMG-macOS-22272e?style=for-the-badge&logo=apple&logoColor=white" height="38" alt="Download AerialMotion.dmg" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="#-requirements"><img src="https://img.shields.io/badge/macOS-14%2B%20%7C%20Sonoma%20%7C%20Sequoia-000000?style=flat-square&logo=apple&logoColor=white" alt="macOS" /></a>
+  <a href="#-architecture"><img src="https://img.shields.io/badge/Swift-6.0-FA7343?style=flat-square&logo=swift&logoColor=white" alt="Swift 6" /></a>
+  <a href="#-performance--resource-usage"><img src="https://img.shields.io/badge/Idle%20CPU-0%25-brightgreen?style=flat-square" alt="0% CPU" /></a>
+  <a href="https://buymeacoffee.com/sachinkaundal"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-FFDD00?style=flat-square&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="MIT License" /></a>
+</p>
+
+<p align="center">
+  🚀 <strong>Live Interactive Demo & 4K Loop Catalog:</strong> <a href="https://imsachink.github.io/AerialMotion/"><strong>https://imsachink.github.io/AerialMotion/</strong></a>
 </p>
 
 <p align="center">

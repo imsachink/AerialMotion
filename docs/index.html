@@ -46,7 +46,7 @@
     "description": "Native macOS application to convert and set custom MP4/MOV videos as system Aerial live wallpapers synchronized between desktop and lock screen with zero battery drain.",
     "url": "https://imsachink.github.io/AerialMotion/",
     "downloadUrl": "https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg",
-    "softwareVersion": "1.0.0",
+    "softwareVersion": "1.2.1",
     "author": {
       "@type": "Person",
       "name": "Sachin Kaundal",
@@ -1173,7 +1173,7 @@
       <a href="#" class="brand">
         <img src="assets/AppIcon.png" alt="AerialMotion Icon" width="32" height="32">
         <span>AerialMotion</span>
-        <span class="brand-version">v1.0</span>
+        <span class="brand-version" id="brandVersion">v1.2.1</span>
       </a>
 
       <ul class="nav-links">
@@ -1558,7 +1558,7 @@
           <div style="margin-top: 18px;">
             <a href="https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg" class="btn btn-secondary" style="font-size: 13px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              <span>Download Latest DMG (v1.0.0)</span>
+              <span id="dmgDownloadText">Download Latest DMG (v1.2.1)</span>
             </a>
           </div>
         </div>
@@ -1800,19 +1800,36 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Fetch Live GitHub Stars
-    async function loadGitHubStars() {
+    // Fetch Live GitHub Stars & Latest Release Version
+    async function loadGitHubData() {
+      // 1. Fetch Stars
       try {
         const res = await fetch('https://api.github.com/repos/imsachink/AerialMotion');
         if (res.ok) {
           const data = await res.json();
           if (data.stargazers_count !== undefined) {
-            document.getElementById('starCount').innerText = `★ ${data.stargazers_count}`;
+            const starEl = document.getElementById('starCount');
+            if (starEl) starEl.innerText = `★ ${data.stargazers_count}`;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Fetch Latest Release Version Dynamically
+      try {
+        const relRes = await fetch('https://api.github.com/repos/imsachink/AerialMotion/releases/latest');
+        if (relRes.ok) {
+          const relData = await relRes.json();
+          if (relData.tag_name) {
+            const versionTag = relData.tag_name;
+            const brandEl = document.getElementById('brandVersion');
+            if (brandEl) brandEl.innerText = versionTag;
+            const dmgTextEl = document.getElementById('dmgDownloadText');
+            if (dmgTextEl) dmgTextEl.innerText = `Download Latest DMG (${versionTag})`;
           }
         }
       } catch (e) {}
     }
-    loadGitHubStars();
+    loadGitHubData();
   </script>
 </body>
 </html>
