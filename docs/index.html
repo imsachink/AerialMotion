@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags & SEO -->
+  <title>AerialMotion — Custom Live Wallpapers for macOS Sonoma & Sequoia</title>
+  <meta name="title" content="AerialMotion — Custom Live Wallpapers for macOS Sonoma & Sequoia">
+  <meta name="description" content="Turn any MP4 or MOV video into your native macOS Sonoma and Sequoia Aerial live wallpaper. Synchronized desktop and lock screen playback with ~0% idle CPU and zero background daemons.">
+  <meta name="keywords" content="macOS live wallpaper, mac aerial wallpaper, sonoma animated wallpaper, sequoia video wallpaper, apple aerial screensaver, custom aerial mac, battery friendly mac wallpaper, open source mac wallpaper">
+  <meta name="author" content="Sachin Kaundal">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://imsachink.github.io/AerialMotion/">
+  <meta property="og:title" content="AerialMotion — Custom Live Wallpapers for macOS Sonoma & Sequoia">
+  <meta property="og:description" content="Synchronized desktop and lock screen live wallpapers for macOS with ~0% idle CPU. Free & open-source on GitHub.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/hero_banner.jpg">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://imsachink.github.io/AerialMotion/">
+  <meta name="twitter:title" content="AerialMotion — Custom Live Wallpapers for macOS Sonoma & Sequoia">
+  <meta name="twitter:description" content="Set any video as your native macOS Aerial wallpaper with zero background daemons and ~0% idle CPU.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/imsachink/AerialMotion/main/assets/hero_banner.jpg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/AppIcon.png">
+  <link rel="apple-touch-icon" href="assets/AppIcon.png">
+
+  <!-- Schema.org SoftwareApplication JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "AerialMotion",
+    "operatingSystem": "macOS Sonoma (14.0+), macOS Sequoia (15.0+)",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Native macOS application to convert and set custom MP4/MOV videos as system Aerial live wallpapers synchronized between desktop and lock screen with zero battery drain.",
+    "url": "https://imsachink.github.io/AerialMotion/",
+    "downloadUrl": "https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg",
+    "softwareVersion": "1.0.0",
+    "author": {
+      "@type": "Person",
+      "name": "Sachin Kaundal",
+      "url": "https://github.com/imsachink"
+    }
+  }
+  </script>
+
+  <!-- Schema.org FAQPage JSON-LD for Google Search Rich Snippets -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Which macOS versions are supported by AerialMotion?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "AerialMotion supports macOS Sonoma (14.0+) and macOS Sequoia (15.0+), running natively on both Apple Silicon (M1, M2, M3, M4) and Intel-based Macs. It takes direct advantage of Apple's modern dynamic Aerial screensaver architecture."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does AerialMotion drain MacBook battery or increase CPU usage?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Unlike traditional live wallpaper apps that run continuous decoding loops in the background, AerialMotion uses Apple's native hardware remuxing to convert videos directly into the macOS WallpaperAgent container. It consumes ~0% idle CPU and automatically pauses when on battery or in Low Power Mode."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What video file formats and resolutions does AerialMotion support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "AerialMotion supports .mp4 and .mov files in 1080p, 4K, and 8K resolutions at up to 60fps and 120fps ProMotion. It natively processes HEVC (H.265), H.264, and Apple ProRes codecs without quality loss."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does AerialMotion synchronize the lock screen and desktop wallpaper?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "AerialMotion integrates directly with macOS WallpaperAgent's hierarchical aerial format, creating a synchronized dual-layer package. This ensures your custom video plays identically when your Mac is locked, asleep, or unlocked without stutter or glitching."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does AerialMotion support multiple monitors and external displays?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. AerialMotion supports multi-display setups on macOS Sonoma and Sequoia, including Studio Display, Pro Display XDR, and third-party ultrawide monitors, allowing synchronized playback across connected screens."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is AerialMotion different from Wallpaper Engine or Aerial screensaver?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Traditional apps like Wallpaper Engine run as separate third-party background applications that consume 15%-35% CPU and cannot touch the macOS lock screen. AerialMotion is native, lightweight (~0% CPU), free and open-source (MIT), and integrates directly into the macOS system aerial layer."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why does macOS show a security prompt or Gatekeeper notice on first launch?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "AerialMotion is free, independent open-source software distributed without Apple's $99/year developer certificate. On first launch, simply right-click AerialMotion in Applications and select Open, or run 'xattr -cr /Applications/AerialMotion.app' in Terminal."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does video playback pause when gaming or running full-screen apps?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Built-in window occlusion detection automatically halts wallpaper rendering whenever full-screen applications, video games, or maximized windows cover the desktop, ensuring maximum performance for your active tasks."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I revert back to official Apple wallpapers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, AerialMotion is 100% reversible. Simply click 'Restore Apple Defaults' in the menu bar settings or choose any standard Apple wallpaper in macOS System Settings. No system files are permanently modified."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I completely uninstall AerialMotion?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Because AerialMotion runs without persistent daemon agents or hidden root background processes, you can simply quit the app and drag AerialMotion.app from Applications to the Trash."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #09090b;
+      --bg-alt: #121216;
+      --panel: rgba(255, 255, 255, 0.04);
+      --panel-border: rgba(255, 255, 255, 0.09);
+      --panel-hover: rgba(255, 255, 255, 0.08);
+      --ink: #f5f5f7;
+      --ink-muted: #a1a1aa;
+      --ink-faint: #71717a;
+      --accent: #2997ff;
+      --accent-glow: rgba(41, 151, 255, 0.28);
+      --accent-gradient: linear-gradient(135deg, #2997ff 0%, #a259ff 50%, #ff61d2 100%);
+      --code-bg: rgba(0, 0, 0, 0.45);
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.25);
+      --shadow-lg: 0 30px 90px -20px rgba(0, 0, 0, 0.8), 0 10px 40px rgba(0, 0, 0, 0.5);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 26px;
+      --radius-full: 9999px;
+      color-scheme: dark;
+    }
+
+    [data-theme="light"] {
+      --bg: #fbfbfd;
+      --bg-alt: #f0f0f4;
+      --panel: rgba(255, 255, 255, 0.85);
+      --panel-border: rgba(0, 0, 0, 0.08);
+      --panel-hover: rgba(255, 255, 255, 0.98);
+      --ink: #1d1d1f;
+      --ink-muted: #6e6e73;
+      --ink-faint: #86868b;
+      --accent: #0071e3;
+      --accent-glow: rgba(0, 113, 227, 0.18);
+      --accent-gradient: linear-gradient(135deg, #0071e3 0%, #5856d6 50%, #af52de 100%);
+      --code-bg: #e8e8ed;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 30px 90px -20px rgba(0, 0, 0, 0.12), 0 10px 40px rgba(0, 0, 0, 0.05);
+      color-scheme: light;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 50% 0%, rgba(41, 151, 255, 0.12) 0px, transparent 650px),
+        radial-gradient(at 90% 25%, rgba(162, 89, 255, 0.06) 0px, transparent 550px),
+        radial-gradient(at 10% 65%, rgba(41, 151, 255, 0.05) 0px, transparent 500px);
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    a { color: var(--accent); text-decoration: none; transition: opacity 0.15s ease; }
+    a:hover { opacity: 0.85; }
+
+    .wrap {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* Glass Navigation Bar */
+    header.navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      background: rgba(9, 9, 11, 0.75);
+      border-bottom: 1px solid var(--panel-border);
+      transition: background 0.3s ease;
+    }
+    [data-theme="light"] header.navbar {
+      background: rgba(251, 251, 253, 0.82);
+    }
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 66px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--ink);
+      letter-spacing: -0.025em;
+      white-space: nowrap;
+    }
+    .brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    .brand-version {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-faint);
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      letter-spacing: 0;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      list-style: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .nav-links a {
+      color: var(--ink-muted);
+      transition: color 0.18s ease;
+      padding: 6px 4px;
+    }
+    .nav-links a:hover {
+      color: var(--ink);
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .nav-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--panel-border);
+      margin: 0 4px;
+    }
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--panel-border);
+      color: var(--ink);
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .theme-toggle:hover {
+      background: var(--panel-hover);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--bg);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+    .btn-primary:hover {
+      opacity: 0.92;
+      color: var(--bg);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+    .btn-accent {
+      background: linear-gradient(180deg, #3aa0ff 0%, #1e87f0 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 6px 24px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+    .btn-accent:hover {
+      background: linear-gradient(180deg, #4da8ff 0%, #258ef7 100%);
+      box-shadow: 0 8px 28px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--panel);
+      color: var(--ink);
+      border: 1px solid var(--panel-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .btn-secondary:hover {
+      background: var(--panel-hover);
+      border-color: rgba(255, 255, 255, 0.18);
+      color: var(--ink);
+    }
+    .star-counter {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-full);
+      margin-left: 2px;
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 70px 0 50px;
+      position: relative;
+    }
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--ink-muted);
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #34c759;
+      box-shadow: 0 0 10px #34c759;
+    }
+    .hero-title {
+      font-size: clamp(38px, 5.6vw, 68px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      max-width: 960px;
+      margin: 0 auto 20px;
+      color: var(--ink);
+    }
+    .gradient-text {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline;
+    }
+    .hero-subtitle {
+      font-size: clamp(16px, 1.8vw, 20px);
+      color: var(--ink-muted);
+      max-width: 720px;
+      margin: 0 auto 34px;
+      font-weight: 400;
+      line-height: 1.55;
+    }
+    .hero-subtitle code {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      font-size: 0.9em;
+      background: var(--code-bg);
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid var(--panel-border);
+      color: var(--ink);
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .hero-actions .btn {
+      padding: 13px 28px;
+      font-size: 15.5px;
+    }
+    .hero-trust-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      font-size: 12.5px;
+      color: var(--ink-faint);
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+    }
+    .hero-trust-bar span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Showcase Studio Frame (Retina MacBook Pro Mockup) */
+    .showcase-stage {
+      position: relative;
+      margin: 0 auto;
+      max-width: 1040px;
+      perspective: 1000px;
+    }
+    .mac-hardware-bezel {
+      background: #141416;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 12px 12px 14px;
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+    [data-theme="light"] .mac-hardware-bezel {
+      background: #e2e2e7;
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+    .mac-notch-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 14px 10px;
+      font-size: 12px;
+      color: var(--ink-faint);
+    }
+    .traffic-dots {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .traffic-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .traffic-dot.red { background: #ff5f56; border: 1px solid rgba(0,0,0,0.15); }
+    .traffic-dot.yellow { background: #ffbd2e; border: 1px solid rgba(0,0,0,0.15); }
+    .traffic-dot.green { background: #27c93f; border: 1px solid rgba(0,0,0,0.15); }
+
+    .showcase-mode-switch {
+      display: flex;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-full);
+      padding: 3px;
+      gap: 2px;
+    }
+    [data-theme="light"] .showcase-mode-switch {
+      background: rgba(255, 255, 255, 0.7);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--ink-muted);
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    .retina-display-screen {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      border-radius: 12px;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+      transition: background-image 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    }
+    .display-screen-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, transparent 20%, transparent 80%, rgba(0, 0, 0, 0.35) 100%);
+      pointer-events: none;
+    }
+
+    /* macOS Menubar Simulation in Desktop Mode */
+    .sim-mac-menubar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 28px;
+      background: rgba(15, 15, 20, 0.45);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+      z-index: 2;
+    }
+    .sim-dock-indicator {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      padding: 8px 16px;
+      background: rgba(20, 20, 25, 0.4);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      z-index: 2;
+    }
+    .dock-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.15s ease;
+    }
+    .dock-icon:hover { transform: scale(1.18) translateY(-4px); }
+
+    /* macOS Sonoma/Sequoia Lock Screen HUD */
+    .lockscreen-hud {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      text-align: center;
+      color: #ffffff;
+      padding-bottom: 40px;
+    }
+    .lock-time-display {
+      font-size: 88px;
+      font-weight: 200;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      font-variant-numeric: tabular-nums;
+    }
+    .lock-date-display {
+      font-size: 19px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      margin-top: 8px;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+      opacity: 0.95;
+    }
+    .lock-touchid-prompt {
+      margin-top: 45px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      padding: 7px 16px;
+      border-radius: var(--radius-full);
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      opacity: 0.85;
+    }
+
+    /* Live In-App Demo Video View */
+    .inapp-demo-view {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000000;
+      z-index: 3;
+    }
+    .inapp-demo-view img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Floating Wallpaper Selector Strip */
+    .wallpaper-selector-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 14px 4px;
+      flex-wrap: wrap;
+    }
+    .strip-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--panel-border);
+      color: var(--ink-muted);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .strip-pill img {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      object-fit: cover;
+    }
+    .strip-pill:hover {
+      background: var(--panel-hover);
+      color: var(--ink);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .strip-pill.active {
+      background: rgba(41, 151, 255, 0.15);
+      border-color: var(--accent);
+      color: var(--ink);
+      box-shadow: 0 0 16px rgba(41, 151, 255, 0.25);
+    }
+
+    /* Metrics Strip */
+    .metrics-section {
+      padding: 70px 0 40px;
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .metric-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      text-align: left;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .metric-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+    .metric-val {
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 10px;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .metric-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .metric-sub {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.4;
+    }
+
+    /* Section Common Styles */
+    section.content-section {
+      padding: 80px 0;
+    }
+    .section-kicker {
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(30px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.15;
+      margin-bottom: 18px;
+      color: var(--ink);
+    }
+    .section-desc {
+      font-size: 17px;
+      color: var(--ink-muted);
+      max-width: 680px;
+      margin-bottom: 44px;
+      line-height: 1.55;
+    }
+
+    /* Bento Grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    .bento-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      padding: 32px 28px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .bento-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-sm);
+    }
+    .bento-icon-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: rgba(41, 151, 255, 0.12);
+      border: 1px solid rgba(41, 151, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 22px;
+      color: var(--accent);
+    }
+    .bento-card h3 {
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      color: var(--ink);
+    }
+    .bento-card p {
+      font-size: 14.5px;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+
+    /* Comparison Matrix */
+    .comp-container {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-sm);
+    }
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .comp-table th, .comp-table td {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--panel-border);
+    }
+    .comp-table tr:last-child td {
+      border-bottom: none;
+    }
+    .comp-table th {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-muted);
+      background: rgba(0, 0, 0, 0.2);
+    }
+    [data-theme="light"] .comp-table th {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    .comp-table th.col-highlight {
+      color: var(--accent);
+      background: rgba(41, 151, 255, 0.08);
+      border-left: 1px solid rgba(41, 151, 255, 0.2);
+      border-right: 1px solid rgba(41, 151, 255, 0.2);
+    }
+    .comp-table td.col-highlight {
+      background: rgba(41, 151, 255, 0.04);
+      border-left: 1px solid rgba(41, 151, 255, 0.15);
+      border-right: 1px solid rgba(41, 151, 255, 0.15);
+      font-weight: 600;
+    }
+    .check-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #34c759;
+      font-size: 14px;
+    }
+    .cross-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #ff453a;
+      font-size: 13.5px;
+    }
+    .feature-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .feature-sub {
+      font-size: 12.5px;
+      color: var(--ink-muted);
+      margin-top: 3px;
+    }
+
+    /* 4K Gallery Section */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+    .gallery-card {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .gallery-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: var(--shadow-sm);
+    }
+    .gallery-img-box {
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      position: relative;
+    }
+    .gallery-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.35s ease;
+    }
+    .gallery-card:hover .gallery-img-box img {
+      transform: scale(1.05);
+    }
+    .gallery-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .gallery-meta {
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .gallery-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    /* Index-0 Inspired First-Launch Experience */
+    .install-experience {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: var(--shadow-sm);
+    }
+    .install-header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(52, 199, 89, 0.12);
+      border: 1px solid rgba(52, 199, 89, 0.25);
+      color: #34c759;
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .install-steps-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .step-box {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      position: relative;
+    }
+    [data-theme="light"] .step-box {
+      background: rgba(255, 255, 255, 0.6);
+    }
+    .step-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .step-box h4 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .step-box p {
+      font-size: 14px;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+    .code-snippet-box {
+      margin-top: 14px;
+      background: var(--code-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", monospace;
+      font-size: 12.5px;
+      color: var(--ink);
+    }
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--panel-border);
+      border-radius: 5px;
+      color: var(--ink-muted);
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .copy-btn:hover {
+      background: var(--panel-hover);
+      color: var(--ink);
+    }
+
+    /* FAQ Accordion */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .faq-question {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 20px 24px;
+      text-align: left;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: color 0.15s ease;
+    }
+    .faq-question:hover {
+      color: var(--accent);
+    }
+    .faq-arrow {
+      transition: transform 0.25s ease;
+      color: var(--ink-faint);
+    }
+    .faq-item.open .faq-arrow {
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+    .faq-answer {
+      display: none;
+      padding: 0 24px 22px;
+      font-size: 14.5px;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    /* Final CTA */
+    .final-cta-card {
+      background: linear-gradient(180deg, rgba(41, 151, 255, 0.12) 0%, rgba(162, 89, 255, 0.05) 100%), var(--panel);
+      border: 1px solid rgba(41, 151, 255, 0.25);
+      border-radius: var(--radius-xl);
+      padding: 60px 40px;
+      text-align: center;
+      margin: 40px 0 80px;
+      box-shadow: var(--shadow-lg);
+    }
+    .final-cta-card h2 {
+      font-size: clamp(30px, 3.8vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+      color: var(--ink);
+    }
+    .final-cta-card p {
+      font-size: 17px;
+      color: var(--ink-muted);
+      max-width: 600px;
+      margin: 0 auto 32px;
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    footer.page-footer {
+      border-top: 1px solid var(--panel-border);
+      padding: 40px 0;
+      color: var(--ink-faint);
+      font-size: 13.5px;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      list-style: none;
+    }
+    .footer-links a {
+      color: var(--ink-muted);
+    }
+    .footer-links a:hover {
+      color: var(--ink);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .bento-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .install-steps-grid { grid-template-columns: 1fr; }
+      .retina-display-screen { height: 360px; }
+      .lock-time-display { font-size: 58px; }
+    }
+    @media (max-width: 600px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .comp-table th, .comp-table td { padding: 14px 12px; }
+      .retina-display-screen { height: 280px; }
+      .hero-title { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Glass Navbar -->
+  <header class="navbar">
+    <div class="wrap nav-container">
+      <a href="#" class="brand">
+        <img src="assets/AppIcon.png" alt="AerialMotion Icon" width="32" height="32">
+        <span>AerialMotion</span>
+        <span class="brand-version">v1.0</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#demo">Live Demo</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#comparison">Comparison</a></li>
+        <li><a href="#gallery">4K Loops</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light appearance" title="Toggle appearance">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <span class="nav-divider"></span>
+        <a href="https://buymeacoffee.com/sachinkaundal" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" aria-label="Buy Me A Coffee" title="Buy Me A Coffee" style="padding: 7px 11px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+        </a>
+        <a href="https://github.com/imsachink/AerialMotion" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" aria-label="Star on GitHub">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          <span>Star</span>
+          <span class="star-counter" id="starCount">★ 1</span>
+        </a>
+        <a href="https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg" class="btn btn-primary" aria-label="Download DMG">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Download</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero wrap" id="overview">
+    <div class="pill-badge">
+      <span class="pill-dot"></span>
+      <span>macOS Sonoma (14+) & Sequoia (15+) Native • Zero Background Daemons</span>
+    </div>
+    <h1 class="hero-title">Turn any video into your native <br><span class="gradient-text">macOS Aerial wallpaper.</span></h1>
+    <p class="hero-subtitle">Set custom <code>.mp4</code> and <code>.mov</code> files as your desktop and lock screen wallpaper. Fluid native Apple media engine transitions with <strong>~0% idle CPU</strong> and zero continuous battery drain.</p>
+
+    <div class="hero-actions">
+      <a href="https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg" class="btn btn-accent" id="primaryCta">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <span>Download for macOS (.dmg)</span>
+      </a>
+      <a href="https://github.com/imsachink/AerialMotion" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+        <svg width="17" height="17" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span>View Source on GitHub</span>
+      </a>
+    </div>
+
+    <div class="hero-trust-bar">
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        macOS Sonoma & Sequoia Native
+      </span>
+      <span>•</span>
+      <span>⚡ ~0% Idle CPU Overhead</span>
+      <span>•</span>
+      <span>🛡️ Free & Open Source (MIT)</span>
+      <span>•</span>
+      <span>🔋 Wallspace Battery Saver</span>
+    </div>
+
+    <!-- Retina MacBook Pro Showcase Frame -->
+    <div class="showcase-stage" id="demo">
+      <div class="mac-hardware-bezel">
+        <div class="mac-notch-bar">
+          <div class="traffic-dots">
+            <span class="traffic-dot red"></span>
+            <span class="traffic-dot yellow"></span>
+            <span class="traffic-dot green"></span>
+          </div>
+
+          <!-- View Mode Switcher -->
+          <div class="showcase-mode-switch">
+            <button class="mode-btn active" id="btnDesktop" onclick="setScreenMode('desktop')">Desktop View</button>
+            <button class="mode-btn" id="btnLock" onclick="setScreenMode('lock')">Lock Screen Sync</button>
+            <button class="mode-btn" id="btnDemo" onclick="setScreenMode('demo')">In-App Demo</button>
+          </div>
+        </div>
+
+        <!-- Retina Display Area -->
+        <div class="retina-display-screen" id="screenViewport" style="background-image: url('assets/cozy_forest_cabin_thumb.png');">
+          <div class="display-screen-overlay"></div>
+
+          <!-- Simulated Desktop Menubar & Dock -->
+          <div class="sim-mac-menubar" id="simMenubar">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <img src="assets/AppIcon.png" alt="AerialMotion" width="16" height="16" style="border-radius:3px;">
+              <strong>AerialMotion</strong> &nbsp; File &nbsp; Edit &nbsp; View &nbsp; Window &nbsp; Help
+            </div>
+            <div>🔋 100% &nbsp; 📶 &nbsp; Tue 9:41 AM</div>
+          </div>
+          <div class="sim-dock-indicator" id="simDock">
+            <div class="dock-icon" style="background: #2563eb;"><img src="assets/AppIcon.png" width="30" height="30" style="border-radius:6px;"></div>
+            <div class="dock-icon" style="background: #0ea5e9; color:#fff; font-size:18px;">🌐</div>
+            <div class="dock-icon" style="background: #10b981; color:#fff; font-size:18px;">💬</div>
+            <div class="dock-icon" style="background: #f59e0b; color:#fff; font-size:18px;">📁</div>
+            <div class="dock-icon" style="background: #6b7280; color:#fff; font-size:18px;">⚙️</div>
+          </div>
+
+          <!-- Simulated Sonoma/Sequoia Lock Screen HUD -->
+          <div class="lockscreen-hud" id="lockHud" style="display: none;">
+            <div class="lock-time-display" id="lockTime">09:41</div>
+            <div class="lock-date-display">Tuesday, October 10</div>
+            <div class="lock-touchid-prompt">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>Click or press any key to unlock</span>
+            </div>
+          </div>
+
+          <!-- Real In-App App Demonstration View -->
+          <div class="inapp-demo-view" id="inappDemo" style="display: none;">
+            <img src="assets/demo.gif" alt="AerialMotion Live In-App Demonstration" loading="lazy">
+          </div>
+        </div>
+
+        <!-- 4K Wallpaper Switcher Pills -->
+        <div class="wallpaper-selector-strip" id="wallpaperSelector">
+          <button class="strip-pill active" onclick="switchWallpaper('assets/cozy_forest_cabin_thumb.png', this)">
+            <img src="assets/cozy_forest_cabin_thumb.png" alt="Cozy Cabin" width="22" height="22">
+            <span>🌧️ Cozy Cabin</span>
+          </button>
+          <button class="strip-pill" onclick="switchWallpaper('assets/space_orbital_station_thumb.png', this)">
+            <img src="assets/space_orbital_station_thumb.png" alt="Cosmic Orbital" width="22" height="22">
+            <span>🌌 Cosmic Orbital</span>
+          </button>
+          <button class="strip-pill" onclick="switchWallpaper('assets/deep_space_nebula_thumb.png', this)">
+            <img src="assets/deep_space_nebula_thumb.png" alt="Space Nebula" width="22" height="22">
+            <span>✨ Space Nebula</span>
+          </button>
+          <button class="strip-pill" onclick="switchWallpaper('assets/golden_alpine_meadow_thumb.png', this)">
+            <img src="assets/golden_alpine_meadow_thumb.png" alt="Alpine Meadow" width="22" height="22">
+            <span>🌲 Alpine Meadow</span>
+          </button>
+          <button class="strip-pill" onclick="switchWallpaper('assets/blue_forest_waterfalls_thumb.png', this)">
+            <img src="assets/blue_forest_waterfalls_thumb.png" alt="Forest Waterfalls" width="22" height="22">
+            <span>🌊 Blue Waterfalls</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Performance Architecture Metric Strip -->
+  <section class="metrics-section wrap">
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-val">~0.0%</div>
+        <div class="metric-label">Idle CPU Consumption</div>
+        <div class="metric-sub">Hardware-remuxed with Apple media engines. No CPU transcoding loops.</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">0 MB</div>
+        <div class="metric-label">Background Daemons</div>
+        <div class="metric-sub">Feeds directly into native macOS <code>WallpaperAgent</code>. Closes completely when idle.</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">4K 60fps</div>
+        <div class="metric-label">Fluid HDR Playback</div>
+        <div class="metric-sub">Lossless HEVC and ProRes dynamic playback with zero dropped frames.</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">1-Click</div>
+        <div class="metric-label">Instant Reversible Rollback</div>
+        <div class="metric-sub">Restore Apple's official system aerials at any time with a single tap.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bento Grid Architecture & Features -->
+  <section class="content-section wrap" id="architecture">
+    <div class="section-kicker">Architecture & Features</div>
+    <h2 class="section-title">Engineered natively for Apple Silicon. <br>Zero compromises.</h2>
+    <p class="section-desc">Traditional live wallpaper apps run continuous video players on top of your desktop, causing fan noise, high memory pressure, and broken lock screens. AerialMotion solves this at the system level.</p>
+
+    <div class="bento-grid">
+      <div class="bento-card">
+        <div class="bento-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        </div>
+        <h3>Lock Screen Synchronized</h3>
+        <p>Your video loops smoothly on your desktop AND lock screen. When waking, sleeping, or unlocking, macOS transitions seamlessly without glitching.</p>
+      </div>
+
+      <div class="bento-card">
+        <div class="bento-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 12a11.05 11.05 0 0 0-22 0zm-5 7a3 3 0 0 1-6 0v-7"></path></svg>
+        </div>
+        <h3>Wallspace Battery Guard</h3>
+        <p>Intelligently throttles and pauses when your MacBook is on battery, in Low Power Mode, or when full-screen apps hide your desktop.</p>
+      </div>
+
+      <div class="bento-card">
+        <div class="bento-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </div>
+        <h3>Native Hardware Remuxing</h3>
+        <p>Utilizes Apple Media Engine hardware decoders to convert standard MP4/MOV videos into macOS-native aerial containers in seconds.</p>
+      </div>
+
+      <div class="bento-card">
+        <div class="bento-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+        </div>
+        <h3>Native Centered Settings</h3>
+        <p>Settings window opens cleanly in the center of your screen with dedicated macOS AppKit controls that never accidentally collapse.</p>
+      </div>
+
+      <div class="bento-card">
+        <div class="bento-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+        </div>
+        <h3>1-Click GitHub Auto-Updates</h3>
+        <p>Stay current automatically. AerialMotion integrates with GitHub Releases to notify you and upgrade with zero hassle.</p>
+      </div>
+
+      <div class="bento-card">
+        <div class="bento-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+        <h3>100% Reversible & Safe</h3>
+        <p>Never overwrites protected system files. Revert to Apple’s standard dynamic aerials anytime with a single click in the menu bar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Matrix -->
+  <section class="content-section wrap" id="comparison">
+    <div class="section-kicker">Benchmark Comparison</div>
+    <h2 class="section-title">How AerialMotion compares.</h2>
+    <p class="section-desc">See the architectural difference between native macOS integration versus traditional third-party live wallpaper players.</p>
+
+    <div class="comp-container">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th style="width: 38%;">Feature / Capability</th>
+            <th class="col-highlight" style="width: 32%;">AerialMotion (Native)</th>
+            <th style="width: 30%;">Traditional Mac Wallpaper Apps</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="feature-name">Lock Screen Synchronized Playback</div>
+              <div class="feature-sub">Seamless loop continues when Mac locks or wakes</div>
+            </td>
+            <td class="col-highlight">
+              <span class="check-badge">✓ Full Native Lock Screen Sync</span>
+            </td>
+            <td>
+              <span class="cross-badge">✕ Desktop only (Cannot touch Lock Screen)</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="feature-name">Idle CPU & Resource Usage</div>
+              <div class="feature-sub">Impact on processor while sitting on desktop</div>
+            </td>
+            <td class="col-highlight">
+              <span class="check-badge">✓ ~0.0% Idle CPU (Zero transcoding)</span>
+            </td>
+            <td>
+              <span class="cross-badge">✕ 15% – 35% continuous CPU load</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="feature-name">Battery Saver & Window Occlusion</div>
+              <div class="feature-sub">Pauses when occluded or running on battery</div>
+            </td>
+            <td class="col-highlight">
+              <span class="check-badge">✓ Pauses on battery & low power</span>
+            </td>
+            <td>
+              <span class="cross-badge">✕ Keeps rendering in background</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="feature-name">Mission Control & Spaces</div>
+              <div class="feature-sub">Transitions across multiple desktop spaces</div>
+            </td>
+            <td class="col-highlight">
+              <span class="check-badge">✓ Native Apple Space transitions</span>
+            </td>
+            <td>
+              <span class="cross-badge">✕ Window stutter & overlay flickers</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="feature-name">Pricing & License</div>
+              <div class="feature-sub">Open-source transparency vs proprietary subscriptions</div>
+            </td>
+            <td class="col-highlight">
+              <span class="check-badge">✓ 100% Free & Open Source (MIT)</span>
+            </td>
+            <td>
+              <span class="cross-badge">✕ $2.99 – $9.99 paid subscriptions</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Curated 4K Loop Catalog Preview -->
+  <section class="content-section wrap" id="gallery">
+    <div class="section-kicker">Curated 4K Loops</div>
+    <h2 class="section-title">Stunning verified aerial loops.</h2>
+    <p class="section-desc">Browse calm, cinematic loops tested for smooth 60fps playback and native lock screen synchronization.</p>
+
+    <div class="gallery-grid">
+      <div class="gallery-card">
+        <div class="gallery-img-box">
+          <img src="assets/cozy_forest_cabin_thumb.png" alt="Cozy Rain Cabin" loading="lazy">
+          <span class="gallery-tag">4K Loop</span>
+        </div>
+        <div class="gallery-meta">
+          <span class="gallery-title">🌧️ Cozy Rain Cabin</span>
+        </div>
+      </div>
+
+      <div class="gallery-card">
+        <div class="gallery-img-box">
+          <img src="assets/golden_alpine_meadow_thumb.png" alt="Alpine Meadow" loading="lazy">
+          <span class="gallery-tag">4K Loop</span>
+        </div>
+        <div class="gallery-meta">
+          <span class="gallery-title">🌲 Alpine Meadow</span>
+        </div>
+      </div>
+
+      <div class="gallery-card">
+        <div class="gallery-img-box">
+          <img src="assets/space_orbital_station_thumb.png" alt="Cosmic Orbital" loading="lazy">
+          <span class="gallery-tag">4K Loop</span>
+        </div>
+        <div class="gallery-meta">
+          <span class="gallery-title">🌌 Cosmic Orbital</span>
+        </div>
+      </div>
+
+      <div class="gallery-card">
+        <div class="gallery-img-box">
+          <img src="assets/deep_space_nebula_thumb.png" alt="Space Nebula" loading="lazy">
+          <span class="gallery-tag">4K Loop</span>
+        </div>
+        <div class="gallery-meta">
+          <span class="gallery-title">✨ Deep Nebula</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clean, Non-intrusive First-Launch Experience (Index-0 inspired) -->
+  <section class="content-section wrap" id="install">
+    <div class="section-kicker">Instant Setup</div>
+    <h2 class="section-title">Up and running in 30 seconds.</h2>
+    <p class="section-desc">AerialMotion is completely standalone and requires zero root privileges or dangerous terminal modifications.</p>
+
+    <div class="install-experience">
+      <div class="install-header-badge">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <span>Verified Open Source • Free on GitHub</span>
+      </div>
+
+      <div class="install-steps-grid">
+        <div class="step-box">
+          <div class="step-number">1</div>
+          <h4>Download & Move to Applications</h4>
+          <p>Download <code>AerialMotion.dmg</code> from GitHub Releases, open the DMG, and drag AerialMotion into your <strong>Applications</strong> folder.</p>
+          <div style="margin-top: 18px;">
+            <a href="https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg" class="btn btn-secondary" style="font-size: 13px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Download Latest DMG (v1.0.0)</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="step-box">
+          <div class="step-number">2</div>
+          <h4>First Launch on macOS</h4>
+          <p>As independent open-source software, macOS Gatekeeper may prompt you on first open. Simply <strong>Right-Click (Control-Click) AerialMotion.app</strong> and click <strong>Open</strong>.</p>
+          <div class="code-snippet-box">
+            <span>xattr -cr /Applications/AerialMotion.app</span>
+            <button class="copy-btn" onclick="copyInstallCmd(this)">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="content-section wrap" id="faq">
+    <div class="section-kicker">Frequently Asked Questions</div>
+    <h2 class="section-title">Everything you need to know.</h2>
+    <p class="section-desc">Answers to common questions about setting custom live wallpapers on macOS Sonoma and Sequoia, performance, battery life, and formats.</p>
+
+    <div class="faq-list">
+      <div class="faq-item open">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Which macOS versions are supported by AerialMotion?</span>
+          <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          AerialMotion requires <strong>macOS Sonoma (14.0+)</strong> or <strong>macOS Sequoia (15.0+)</strong>, running natively on both Apple Silicon (M1, M2, M3, M4) and Intel-based Macs. These macOS releases introduced Apple's modern dynamic Aerial screensaver architecture that AerialMotion integrates into.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Does AerialMotion drain MacBook battery or increase CPU usage?</span>
+          <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          No! Traditional live wallpaper apps decode video in continuous software loops that consume 15%–35% CPU. AerialMotion uses Apple's native hardware media engine to remux your video directly into the native <code>WallpaperAgent</code> container. It consumes <strong>~0% idle CPU</strong> and automatically pauses playback when your MacBook is on battery or in Low Power Mode.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What video file formats and resolutions does AerialMotion support?</span>
+          <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          AerialMotion supports standard <code>.mp4</code> and <code>.mov</code> video files across 1080p, 4K, and 8K resolutions at up to 60fps and 120fps (ProMotion). It natively processes HEVC (H.265), H.264, and Apple ProRes codecs without generational compression loss.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How does AerialMotion synchronize the lock screen and desktop wallpaper?</span>
+          <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          AerialMotion hooks directly into macOS <code>WallpaperAgent</code>'s hierarchical aerial container format, generating a unified dual-layer package. When you lock, sleep, or wake your Mac, macOS smoothly transitions the video from screensaver to static lock and live desktop motion without glitching or restarts.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Does AerialMotion support multiple monitors and external displays?</span>
+          <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Yes! Multi-display configurations on macOS Sonoma and Sequoia are fully supported, including Apple Studio Display, Pro Display XDR, and third-party ultrawide monitors. Playback remains synchronized across all active displays.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How is AerialMotion different from Wallpaper Engine or Aerial screensaver?</span>
+          <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Traditional wallpaper tools run heavy background player daemons that cannot modify or sync the macOS lock screen. The famous <em>Aerial</em> screensaver only activates when your Mac goes idle as a screensaver. AerialMotion is the only lightweight, open-source tool designed to set custom videos as the active live desktop AND lock screen wallpaper simultaneously with zero extra daemons.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Why does macOS show a security prompt or Gatekeeper notice on first launch?</span>
+          <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          AerialMotion is independent, 100% free open-source software built by the community without an expensive Apple Developer commercial certificate. On first open, simply <strong>Right-Click (Control-Click) AerialMotion.app</strong> and click <strong>Open</strong>, or run <code>xattr -cr /Applications/AerialMotion.app</code> in Terminal to clear Apple's quarantine flag.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Does video playback pause during gaming or when windows cover the desktop?</span>
+          <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Yes. AerialMotion respects macOS window occlusion notifications. Whenever a game, video player, or productivity app runs full-screen or completely occludes the desktop, rendering cycles pause immediately so 100% of GPU and CPU power is dedicated to your active task.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I easily revert back to official Apple wallpapers?</span>
+          <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Yes! AerialMotion is 100% non-destructive and reversible. Select <strong>"Restore Apple Defaults"</strong> from the menu bar settings at any time, or pick any standard wallpaper in macOS System Settings.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I completely uninstall AerialMotion from my Mac?</span>
+          <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Because AerialMotion installs no root daemons, kernel extensions, or hidden LaunchAgents, uninstalling is completely clean: simply quit AerialMotion from the menu bar and drag <code>AerialMotion.app</code> from your Applications folder to the Trash.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Card -->
+  <section class="wrap">
+    <div class="final-cta-card">
+      <h2>Transform your Mac desktop today.</h2>
+      <p>Download AerialMotion for free. Open-source, battery-friendly, and beautifully synchronized with your lock screen.</p>
+      <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+        <a href="https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg" class="btn btn-accent" style="padding: 13px 30px; font-size: 15.5px;">
+          <span>Download AerialMotion.dmg (Free)</span>
+        </a>
+        <a href="https://github.com/imsachink/AerialMotion" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding: 13px 26px; font-size: 15.5px;">
+          <span>Star on GitHub (⭐)</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Page Footer -->
+  <footer class="page-footer">
+    <div class="wrap footer-inner">
+      <div>
+        <strong>AerialMotion</strong> • Created by <a href="https://github.com/imsachink" target="_blank" rel="noopener">Sachin Kaundal</a>
+      </div>
+      <ul class="footer-links">
+        <li><a href="https://github.com/imsachink/AerialMotion" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://github.com/imsachink/AerialMotion/releases" target="_blank" rel="noopener">Releases</a></li>
+        <li><a href="https://buymeacoffee.com/sachinkaundal" target="_blank" rel="noopener">Buy Me A Coffee</a></li>
+        <li><a href="https://github.com/imsachink/AerialMotion/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Screen Mode Switcher
+    function setScreenMode(mode) {
+      const btnDesktop = document.getElementById('btnDesktop');
+      const btnLock = document.getElementById('btnLock');
+      const btnDemo = document.getElementById('btnDemo');
+      const simMenubar = document.getElementById('simMenubar');
+      const simDock = document.getElementById('simDock');
+      const lockHud = document.getElementById('lockHud');
+      const inappDemo = document.getElementById('inappDemo');
+      const wallpaperSelector = document.getElementById('wallpaperSelector');
+
+      [btnDesktop, btnLock, btnDemo].forEach(b => b.classList.remove('active'));
+
+      if (mode === 'desktop') {
+        btnDesktop.classList.add('active');
+        simMenubar.style.display = 'flex';
+        simDock.style.display = 'flex';
+        lockHud.style.display = 'none';
+        inappDemo.style.display = 'none';
+        wallpaperSelector.style.opacity = '1';
+        wallpaperSelector.style.pointerEvents = 'auto';
+      } else if (mode === 'lock') {
+        btnLock.classList.add('active');
+        simMenubar.style.display = 'none';
+        simDock.style.display = 'none';
+        lockHud.style.display = 'flex';
+        inappDemo.style.display = 'none';
+        wallpaperSelector.style.opacity = '1';
+        wallpaperSelector.style.pointerEvents = 'auto';
+      } else if (mode === 'demo') {
+        btnDemo.classList.add('active');
+        simMenubar.style.display = 'none';
+        simDock.style.display = 'none';
+        lockHud.style.display = 'none';
+        inappDemo.style.display = 'flex';
+        wallpaperSelector.style.opacity = '0.4';
+        wallpaperSelector.style.pointerEvents = 'none';
+      }
+    }
+
+    // Wallpaper Switcher
+    function switchWallpaper(imgUrl, el) {
+      const viewport = document.getElementById('screenViewport');
+      viewport.style.backgroundImage = `url('${imgUrl}')`;
+      document.querySelectorAll('.strip-pill').forEach(btn => btn.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // Copy Install Terminal Command
+    function copyInstallCmd(btn) {
+      navigator.clipboard.writeText('xattr -cr /Applications/AerialMotion.app').then(() => {
+        const orig = btn.innerText;
+        btn.innerText = 'Copied!';
+        setTimeout(() => { btn.innerText = orig; }, 2000);
+      });
+    }
+
+    // FAQ Accordion
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      item.classList.toggle('open');
+    }
+
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', next);
+    });
+
+    // Real-time Clock for Lock Screen
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const clockEl = document.getElementById('lockTime');
+      if (clockEl) clockEl.innerText = `${hours}:${minutes}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Fetch Live GitHub Stars
+    async function loadGitHubStars() {
+      try {
+        const res = await fetch('https://api.github.com/repos/imsachink/AerialMotion');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.stargazers_count !== undefined) {
+            document.getElementById('starCount').innerText = `★ ${data.stargazers_count}`;
+          }
+        }
+      } catch (e) {}
+    }
+    loadGitHubStars();
+  </script>
+</body>
+</html>

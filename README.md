@@ -12,6 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/imsachink/AerialMotion/releases/latest/download/AerialMotion.dmg"><img src="https://img.shields.io/badge/Download-AerialMotion.dmg-007AFF?style=for-the-badge&logo=apple&logoColor=white" alt="Download AerialMotion.dmg" /></a>
+  <a href="https://imsachink.github.io/AerialMotion/"><img src="https://img.shields.io/badge/Website-Live%20Demo-5856D6?style=for-the-badge&logo=safari&logoColor=white" alt="Live Website" /></a>
   <a href="#-requirements"><img src="https://img.shields.io/badge/macOS-14%2B%20%7C%20Sonoma%20%7C%20Sequoia-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS" /></a>
   <a href="#-architecture"><img src="https://img.shields.io/badge/Swift-6.0-FA7343?style=for-the-badge&logo=swift&logoColor=white" alt="Swift 6" /></a>
   <a href="#-performance--resource-usage"><img src="https://img.shields.io/badge/Idle%20CPU-0%25-brightgreen?style=for-the-badge" alt="0% CPU" /></a>
