@@ -125,9 +125,9 @@ final class CuratedGalleryManager: ObservableObject {
     // MARK: - Download and Apply
 
     func downloadAndApply(item: CuratedWallpaperItem, store: WallpaperStore) {
-        // 1. If already in Library, activate directly!
+        // 1. If already in Library, activate directly with forced lockscreen sync!
         if let existing = findExisting(item: item, store: store) {
-            store.activate(existing)
+            store.activate(existing, force: true)
             return
         }
 

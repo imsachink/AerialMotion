@@ -86,7 +86,8 @@ AerialMotion follows [Semantic Versioning](https://semver.org/). See the complet
 
 | Version | Highlights | Status |
 | :---: | :--- | :---: |
-| **v1.2.0** | **Discover 4K Curated Gallery (9 Presets)**: In-app open-source wallpaper browsing across Space & Dark, Zen & Japan, Cozy & Lo-Fi, and Deep Nature with full creator credits, live GitHub catalog sync (🔄), dedicated Settings window, and fast cancelable streaming downloader. | **Latest Release** |
+| **v1.2.1** | **Lock Screen & Desktop Sync**: Fixed desync between desktop playback and macOS Lock Screen; full `Index.plist` multi-display & virtual space mapping; automatic startup sync; 1-click lockscreen re-sync. | **Latest Release** |
+| **v1.2.0** | **Discover 4K Curated Gallery (9 Presets)**: In-app open-source wallpaper browsing across Space & Dark, Zen & Japan, Cozy & Lo-Fi, and Deep Nature with full creator credits, live GitHub catalog sync (🔄), dedicated Settings window, and fast cancelable streaming downloader. | Stable |
 | **v1.1.2** | **Menu Bar Right-Click Fix**: Completely eliminated global top-edge click interception, restoring standard macOS 1-click popover interaction. | Stable |
 | **v1.1.1** | **1-Click Native File Picker** (`⌘N` or click anywhere on drop zone), proper Dock/Finder window layer ordering (`-2147483604`), and instant popover sizing. | Stable |
 | **v1.1.0** | **Continuous Desktop Live Motion** (`AVPlayerLayer`), Wallspace-style multi-tier **Battery Saver** (Pause on Battery, Low Power Mode, Window Occlusion Sensing), and direct **In-App Auto-Updater**. | Stable |

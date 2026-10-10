@@ -45,10 +45,14 @@ enum CatalogManager {
 
         // Copy .mov into the macOS aerial catalog directory
         let dst = item.catalogVideoURL
-        if fm.fileExists(atPath: dst.path) { try? fm.removeItem(at: dst) }
-        try fm.copyItem(at: item.libraryVideoURL, to: dst)
-        try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: dst.path)
-        _ = await VideoProcessor.run("/usr/bin/xattr", "-cr", dst.path)
+        if fm.fileExists(atPath: item.libraryVideoURL.path) {
+            if fm.fileExists(atPath: dst.path) { try? fm.removeItem(at: dst) }
+            try fm.copyItem(at: item.libraryVideoURL, to: dst)
+            try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: dst.path)
+            _ = await VideoProcessor.run("/usr/bin/xattr", "-cr", dst.path)
+        } else if !fm.fileExists(atPath: dst.path) {
+            throw VideoProcessorError.unreadableVideo("Wallpaper video file not found at \(item.libraryVideoURL.path)")
+        }
 
         // Copy thumbnail
         let dstThumb = item.catalogThumbURL

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.2.1] - 2026-10-10
+
+### 🐛 Fixes & Improvements
+* **Lock Screen & Desktop Synchronization**: Resolved desynchronization between the live desktop wallpaper and the native macOS Lock Screen when selecting wallpapers from the Discover gallery.
+* **Complete Index.plist Architecture**: `IndexManager` now populates `Desktop`, `Idle`, and `Linked` configurations across `AllSpacesAndDisplays`, `SystemDefault`, physical display UUIDs (`Displays`), and virtual spaces (`Spaces`), ensuring `WallpaperAerialsExtension` always locks onto the correct asset.
+* **Automatic Launch Verification**: App startup now automatically checks and guarantees synchronization between the active library wallpaper and Apple's lock screen catalog.
+* **1-Click Lock Screen Re-Sync**: Discover and Library items can now be re-synced anytime with a single click.
+
+---
+
 ## [v1.2.0] - 2026-10-09
 
 ### ✨ New Features

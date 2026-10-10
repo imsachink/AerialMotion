@@ -50,6 +50,12 @@ final class WallpaperStore: ObservableObject {
             if fm.fileExists(atPath: videoURL.path) {
                 LiveDesktopManager.shared.setVideoURL(videoURL)
             }
+            // Ensure lock screen Index.plist is verified and synced with active wallpaper at launch
+            Task {
+                try? await CatalogManager.install(item: item)
+                try? IndexManager.point(at: id)
+                await WallpaperAgent.reload()
+            }
         }
     }
 
@@ -135,8 +141,16 @@ final class WallpaperStore: ObservableObject {
 
     // MARK: - Activate an existing wallpaper
 
-    func activate(_ item: WallpaperItem) {
-        guard activeID != item.id else { return }
+    func activate(_ item: WallpaperItem, force: Bool = false) {
+        if !force && activeID == item.id {
+            // Even if activeID matches, ensure Index.plist and LockScreen are in sync
+            Task {
+                try? await CatalogManager.install(item: item)
+                try? IndexManager.point(at: item.id)
+                await WallpaperAgent.reload()
+            }
+            return
+        }
         Task {
             do {
                 try await CatalogManager.install(item: item)

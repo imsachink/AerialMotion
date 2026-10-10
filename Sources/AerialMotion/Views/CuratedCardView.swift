@@ -236,8 +236,8 @@ struct CuratedCardView: View {
                                 .controlSize(.mini)
                             Text("Setting...")
                         } else if isApplied {
-                            Image(systemName: "checkmark")
-                            Text("Applied")
+                            Image(systemName: "checkmark.circle.fill")
+                            Text("Active • Re-sync")
                         } else if isInLibrary {
                             Image(systemName: "play.fill")
                             Text("Switch to this")
@@ -253,7 +253,7 @@ struct CuratedCardView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
                 .tint(isApplied ? Color.secondary.opacity(0.3) : (isProcessing ? Color.orange : (isInLibrary ? Color.blue : Color.accentColor)))
-                .disabled(isApplied || isProcessing)
+                .disabled(isProcessing)
                 .padding(.top, 2)
             }
         }
