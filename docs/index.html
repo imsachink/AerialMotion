@@ -114,7 +114,7 @@
         "name": "Why does macOS show a security prompt or Gatekeeper notice on first launch?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "AerialMotion is free, independent open-source software distributed without Apple's $99/year developer certificate. On first launch, simply right-click AerialMotion in Applications and select Open, or run 'xattr -cr /Applications/AerialMotion.app' in Terminal."
+          "text": "AerialMotion is independent open-source software distributed directly on GitHub outside the Mac App Store. On first launch on macOS Sonoma or Sequoia, open Terminal and run 'xattr -cr /Applications/AerialMotion.app' (or click Open Anyway in System Settings → Privacy & Security)."
         }
       },
       {
@@ -1481,7 +1481,7 @@
               <span class="check-badge">✓ 100% Free & Open Source (MIT)</span>
             </td>
             <td>
-              <span class="cross-badge">✕ $2.99 – $9.99 paid subscriptions</span>
+              <span class="cross-badge">✕ Paid commercial subscriptions</span>
             </td>
           </tr>
         </tbody>
@@ -1565,12 +1565,15 @@
 
         <div class="step-box">
           <div class="step-number">2</div>
-          <h4>First Launch on macOS</h4>
-          <p>As independent open-source software, macOS Gatekeeper may prompt you on first open. Simply <strong>Right-Click (Control-Click) AerialMotion.app</strong> and click <strong>Open</strong>.</p>
+          <h4>First Launch in Terminal</h4>
+          <p>AerialMotion is an <strong>independent open-source project</strong> distributed directly on GitHub outside the Mac App Store. macOS Gatekeeper requires a quick one-time command on first download. Open <strong>Terminal</strong> and run:</p>
           <div class="code-snippet-box">
             <span>xattr -cr /Applications/AerialMotion.app</span>
             <button class="copy-btn" onclick="copyInstallCmd(this)">Copy</button>
           </div>
+          <p style="font-size: 12px; color: var(--ink-faint); margin-top: 8px;">
+            💡 <em>Alternatively, go to <strong>System Settings → Privacy & Security</strong> and click <strong>Open Anyway</strong>.</em>
+          </p>
         </div>
       </div>
     </div>
@@ -1649,7 +1652,7 @@
           <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
         <div class="faq-answer">
-          AerialMotion is independent, 100% free open-source software built by the community without an expensive Apple Developer commercial certificate. On first open, simply <strong>Right-Click (Control-Click) AerialMotion.app</strong> and click <strong>Open</strong>, or run <code>xattr -cr /Applications/AerialMotion.app</code> in Terminal to clear Apple's quarantine flag.
+          AerialMotion is an independent open-source project distributed directly on GitHub outside the Mac App Store. Because it is distributed independently, macOS Gatekeeper flags the initial download with a standard security prompt. To open AerialMotion on macOS Sonoma or Sequoia, simply open your <strong>Terminal</strong> app and run <code>xattr -cr /Applications/AerialMotion.app</code> (or open <strong>System Settings → Privacy & Security</strong> and click <strong>Open Anyway</strong>).
         </div>
       </div>
 

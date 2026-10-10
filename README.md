@@ -66,7 +66,7 @@ Instead of running a background player, it integrates your video directly into m
 | **Battery Impact** | **🔋 Near-Zero (Hardware accelerated)** | ⚠️ Heavy battery drain |
 | **Mission Control Spaces** | **✨ Seamless (No visual glitches)** | ❌ Stuttering window overlays |
 | **System Integration** | ** Native macOS Aerial Engine** | Hacky borderless window |
-| **Cost & License** | **🎁 100% Free & Open Source (MIT)** | $2.99 – $9.99 / Paid Subscriptions |
+| **Cost & License** | **🎁 100% Free & Open Source (MIT)** | Paid Commercial Subscriptions |
 
 ---
 
@@ -132,13 +132,14 @@ AerialMotion follows [Semantic Versioning](https://semver.org/). See the complet
 4. Open **AerialMotion** from Launchpad or Spotlight. It sits quietly in your top menu bar.
 
 > [!IMPORTANT]
-> **First Launch on macOS (Gatekeeper Quarantine):**  
-> Because AerialMotion is an independent open-source project without a paid corporate Apple Developer certificate, macOS Sequoia / Sonoma may prompt about untrusted downloads.  
-> To open the app immediately, run this one-line command in your **Terminal**:
+> **First Launch on macOS (Independent Open Source Notice):**  
+> AerialMotion is an independent open-source project distributed directly on GitHub outside the Mac App Store. Because of this, macOS Gatekeeper flags the initial download with a standard security notice.  
+>  
+> To launch immediately on macOS Sonoma / Sequoia, open your **Terminal** (`⌘ + Space` → type `Terminal`) and paste this one command:
 > ```bash
 > xattr -cr /Applications/AerialMotion.app
 > ```
-> *(Or right-click `AerialMotion.app` in Finder, hold `Option`, and select **Open** → **Open Anyway**).*
+> *(Or open **System Settings → Privacy & Security**, scroll down to the Security section, and click **Open Anyway**).*
 
 ---
 
